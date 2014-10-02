@@ -23,6 +23,10 @@ The assumed file structure is as follows:
 |
 +-- /
 |
++--/arm
+|  |
+|  +--/
+|
 +-- /SPECCPU.tar
 |
 `-- /benchmarking.sh

@@ -17,7 +17,9 @@ Structure:
 The assumed file structure is as follows:
 
 /
+
 /SPECCPU.tar
+
 /benchmarking.sh
 
 

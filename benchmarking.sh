@@ -160,8 +160,6 @@ echo "*************************************************************************"
 
 # install prereqs
 echo "Checking if prerequisites need to be installed and installing if necessary..."
-export http_proxy=https://proxy-us.intel.com:911
-export https_proxy=https://proxy-us.intel.com:911
 
 # if apt-get is installed
 if hash apt-get; then
@@ -199,17 +197,6 @@ if [ ! -d "SPECCPU" ]; then
     wait
     source shrc
     wait
-    echo "Extracting ICC files..."
-    tar xf 'cpu2006.1.2.ic14.0.linux64.for.intel.16jan2014.tar.xz'
-    wait
-    source numa-detection.sh
-    wait
-    ulimit -s unlimited
-    wait 
-    rm -rf topo.txt
-    specperl nhmtopology.pl
-    wait
-    DEVICE=`cat topo.txt`
     cp ../config/*.cfg $SPEC/config/
   else
     # for ARM
@@ -245,14 +232,6 @@ else
   if [ '$PROCESSOR_OPTION' != '3' ]; then
     cd SPECCPU
     source shrc
-    source numa-detection.sh
-    wait
-    ulimit -s unlimited
-    wait 
-    rm -rf topo.txt
-    specperl nhmtopology.pl
-    wait
-    DEVICE=`cat topo.txt`
   else
     cd SPECCPU
     source shrc

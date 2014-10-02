@@ -1,6 +1,8 @@
 SPEC CPU2006 GCC
 ================
 
+This is for SPEC CPU2006 on Linux with either an Intel or ARM processor.
+
 
 Contents:
 ---------

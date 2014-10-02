@@ -1,16 +1,28 @@
 SPEC CPU2006 GCC
 ================
 
+
 Contents:
 ---------
 
++ [Structure](#structure)
 + [Usage](#useage)
 + [Troubleshooting](#troubleshooting)
 + [Optimizing GCC Process](#process-for-optimizing-gcc)
 
 
+Structure:
+----------
+
+The assumed file structure is as follows:
+
+/
+/SPECCPU.tar
+/benchmarking.sh
+
+
 Usage:
-======
+------
 
 Change to directory where files are, then start benchmarking by issuing the following 
 command:

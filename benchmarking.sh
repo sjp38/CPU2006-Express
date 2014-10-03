@@ -200,15 +200,37 @@ if [ ! -d "SPECCPU" ]; then
     cp ../config/*.cfg $SPEC/config/
   else
     # for ARM
-    echo "You you need to manually build SPEC CPU2006 for ARM. Please follow the"
-    echo "directions below. Also, make sure your date and time are set."
-    echo "*************************************************************************"
-    echo $(cat ../arm/README.txt)
-    echo
-    echo "*************************************************************************"
-    echo
-    echo "Exiting now..."
-    echo
+    echo "Building for ARM..."
+    export FORCE_UNSAFE_CONFIGURE=1
+    cd tools/src
+    echo "Patching..."
+    sed -i '/infd = open(tmpfile, O_RDWR|O_CREAT|O_TRUNC);/infd = open(tmpfile, O_RDWR|O_CREAT|O_TRUNC, 0666);/' specinvoke/unix.c
+    sed -i '/$startsh/$startsh -x/' perl-5.12.3/makedepend.SH
+    sed -i '/$startsh -x/a set -x/' perl-5.12.3/makedepend.SH
+    touch setup.sh
+    # write multi-line setup file
+    cat >setup.sh <<EOL
+#!/bin/bash
+PERLFLAGS=-Uplibpth=
+for i in \`gcc -print-search-dirs | grep libraries | cut -f2- -d= | tr ':' '\\n' | grep -v /gcc\`; do
+PERLFLAGS="\$PERLFLAGS -Aplibpth=\$i"
+done
+export PERLFLAGS
+echo $PERLFLAGS
+export CFLAGS="-O2 -march=native -mtune=native"
+echo $CFLAGS
+./buildtools
+EOL
+    chmod +x setup.sh
+    ./setup.sh
+    # if error
+    if [ "$?"-ne 0]; then 
+      sed 's/_GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");//g' tar-1.25/gnu/stdio.in.h
+      sed -i 's/_GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");//g' specsum/gnulib/stdio.in.h
+      sed -i 's/_GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");//g' tar-1.25/gnu/stdio.h
+      sed -i 's/_GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");//g' tar-1.25/mingw/stdio.h
+      sed -i 's/_GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");//g' specsum/win32/stdio.h
+    fi
     exit 
     wait
   fi
@@ -240,7 +262,8 @@ GCC_FULL_INT_FILE=`ls -t $SPEC/result/*.html | head -1`;
 GCC_FULL_INT_OUT=`cat $GCC_FULL_INT_FILE | grep -o -P '(?<=base:).*(?=\")'`;
 $GCC_FULL_INT_OUT 2>/dev/null
 
-if (( $? == 0 )); then
+# if error
+if [ "$?"-ne 0]; then 
     echo "RESULTS: base:"$GCC_FULL_INT_OUT
 else
     GCC_FULL_INT_LOG=`ls -t $SPEC/result/*.log | head -1`
@@ -259,7 +282,8 @@ GCC_FULL_FP_FILE=`ls -t $SPEC/result/*.html | head -1`;
 GCC_FULL_FP_OUT=`cat $GCC_FULL_FP_FILE | grep -o -P '(?<=base:).*(?=\")'`;
 $GCC_FULL_FP_OUT 2>/dev/null
 
-if (( $? == 0 )); then
+# if error
+if [ "$?"-ne 0]; then 
     echo "RESULTS: base:"$GCC_FULL_FP_OUT
 else
     GCC_FULL_FP_LOG=`ls -t $SPEC/result/*.log | head -1`

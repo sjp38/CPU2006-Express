@@ -4,7 +4,7 @@ Building and running SPEC CPU2006 on Linux
 This script is to automate building and running SPEC CPU2006 on Linux with either an Intel or ARM processor using gcc, g++, and gfortran.
 
 
-**NOTE:  The archive `SPECCPU.tar` which contains `cpu2006-1.2.tar.xz`, you must provide. I do not provide this.**
+**NOTE: You must provide the archive `SPECCPU.tar` which contains `cpu2006-1.2.tar.xz`. I do not provide this.**
 
 
 Contents:

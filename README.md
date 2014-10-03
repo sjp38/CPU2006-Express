@@ -24,20 +24,8 @@ The assumed file structure is as follows:
 ```
 /
 ├── arm/
-│   ├── specsum_gnulib/
-|   |   └── stdio.in.h
-│   ├── specsum_win32/
-|   |   └── stdio.h
-│   ├── tar_gnu/
-|   |   ├── stdio.h
-|   |   └── stdio.in.h
-│   ├── tar_mingw/
-|   |   └── stdio.h
-│   ├── makedepend.SH
 │   ├── README.md
-│   ├── README.txt
-│   ├── setup.sh
-│   └── unix.c
+│   └── README.txt
 ├── config/
 │   ├── linux64-armv7-gcc.cfg
 │   ├── linux64-c2750-gcc.cfg

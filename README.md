@@ -19,17 +19,33 @@ Structure:
 The assumed file structure is as follows:
 
 ```
-.
-|
-+-- /
-|
-+--/arm
-|  |
-|  +--/
-|
-+-- /SPECCPU.tar
-|
-`-- /benchmarking.sh
+/
+├── arm/
+│   ├── specsum_gnulib/
+|   |   └── stdio.in.h
+│   ├── specsum_win32/
+|   |   └── stdio.h
+│   ├── tar_gnu/
+|   |   ├── stdio.h
+|   |   └── stdio.in.h
+│   ├── tar_mingw/
+|   |   └── stdio.h
+│   ├── makedepend.SH
+│   ├── README.md
+│   ├── README.txt
+│   ├── setup.sh
+│   └── unix.c
+├── config/
+│   ├── linux64-armv7-gcc.cfg
+│   ├── linux64-c2750-gcc.cfg
+│   ├── linux64-e5_1650-gcc.cfg
+│   ├── lnx-arm-gcc.cfg
+│   ├── lnx-i686-gcc.cfg
+│   └── lnx-x86_64-gcc.cfg
+├── SPECCPU.tar
+│   ├── cpu2006-1.2.tar.xz
+│   └── whatever custom binaries
+└── benchmarking.sh
 ```
 
 Usage:

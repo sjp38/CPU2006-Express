@@ -1,7 +1,7 @@
-SPEC CPU2006 GCC
-================
+Building and running SPEC CPU2006 on Linux
+==========================================
 
-This is for SPEC CPU2006 on Linux with either an Intel or ARM processor.
+This script is to automate building and running SPEC CPU2006 on Linux with either an Intel or ARM processor using gcc, g++, and gfortran.
 
 
 Contents:

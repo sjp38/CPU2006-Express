@@ -200,46 +200,24 @@ if [ ! -d "SPECCPU" ]; then
     cp ../config/*.cfg $SPEC/config/
   else
     # for ARM
-    if [[ $OS == *'Ubuntu'* ]]; then
-      apt-get install ntp
-    fi
-    cd tools/src
-    # allow root configure
-    export FORCE_UNSAFE_CONFIGURE=1
-    # patch files
-    cp ../../../arm/unix.c specinvoke/unix.c
-    cp ../../../arm/makedepend.SH perl-5.12.3/makedepend.SH
-    # build script
-    cp ../../../arm/setup.sh ./
-    chmod +x setup.sh
-    # fix build errors
-    cp ../../../arm/tar_gnu/stdio.in.h tar-1.25/gnu/stdio.in.h
-    wait
-    cp ../../../arm/specsum_gnulib/stdio.in.h specsum/gnulib/stdio.in.h
-    wait
-    cp ../../../arm/tar_gnu/stdio.h tar-1.25/gnu/stdio.h
-    wait
-    cp ../../../arm/tar_mingw/stdio.h tar-1.25/mingw/stdio.h
-    wait
-    cp ../../../arm/specsum_win32/stdio.h specsum/win32/stdio.h
-    wait
-    # should display nothing
-    ./setup.sh
+    echo "You you need to manually build SPEC CPU2006 for ARM. Please follow the"
+    echo "directions below. Also, make sure your date and time are set."
+    echo "*************************************************************************"
+    echo $(cat ../arm/README.txt)
+    echo
+    echo "*************************************************************************"
+    echo
+    echo "Exiting now..."
+    echo
+    exit 
     wait
   fi
 else
   # if SPECCPU is extracted
-  if [ '$PROCESSOR_OPTION' != '3' ]; then
-    cd SPECCPU
-    source shrc
-  else
-    cd SPECCPU
-    source shrc
-  fi
+  cd SPECCPU
+  source shrc
 fi
-
 wait
-
 echo "*************************************************************************"
 
 # check if in SPECCPU directory  

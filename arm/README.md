@@ -163,9 +163,11 @@ find ./ -type f -exec grep -H '_GL_WARN_ON_USE (gets, "gets is a security hole -
 To remove the line:
 
 ```bash
-sed 's/_GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");//g' tar-1.25/gnu/stdio.in.h > tar-1.25/gnu/stdio.in.h.tmp; mv tar-1.25/gnu/stdio.in.h.tmp tar-1.25/gnu/stdio.in.h
-sed 's/_GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");//g' specsum/gnulib/stdio.in.h > specsum/gnulib/stdio.in.h.tmp; mv specsum/gnulib/stdio.in.h.tmp specsum/gnulib/stdio.in.h
-sed 's/_GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");//g' tar-1.25/gnu/stdio.h > tar-1.25/gnu/stdio.h.tmp; mv tar-1.25/gnu/stdio.h.tmp tar-1.25/gnu/stdio.h
-sed 's/_GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");//g' tar-1.25/mingw/stdio.h > tar-1.25/mingw/stdio.h.tmp; mv tar-1.25/mingw/stdio.h.tmp tar-1.25/mingw/stdio.h
-sed 's/_GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");//g' specsum/win32/stdio.h > specsum/win32/stdio.h.tmp; mv specsum/win32/stdio.h.tmp specsum/win32/stdio.h
+sed -i 's/_GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");//g' tar-1.25/gnu/stdio.in.h
+
+sed -i 's/_GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");//g' specsum/gnulib/stdio.in.h
+
+sed -i 's/_GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");//g' tar-1.25/mingw/stdio.h
+
+sed -i 's/_GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");//g' specsum/win32/stdio.h
 ```

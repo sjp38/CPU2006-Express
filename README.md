@@ -24,8 +24,8 @@ The assumed file structure is as follows:
 ```
 /
 ├── arm/
-│   ├── README.md
-│   └── README.txt
+│   ├── config.guess
+│   └── README.md
 ├── config/
 │   ├── linux64-armv7-gcc.cfg
 │   ├── linux64-c2750-gcc.cfg

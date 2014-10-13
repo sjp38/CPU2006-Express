@@ -3,9 +3,17 @@
 # detect os architecture, os distribution, and os version
 # displays bits, either 64 or 32
 ARCH=$(uname -m | sed 's/x86_//;s/i[3-6]86/32/')
-# if ARM, set to 32 bit
+
+# if it is an ARM system
 if [[ $ARCH == *'arm'* ]]; then
-  ARCH='32'
+  # get the arm version number
+  ARM_V=$(echo $ARCH | sed 's/armv//g' | head -c1)
+  # if ARMv8 or greater, set to 62 bit
+  if [ $ARM_V -ge '8' ]; then
+    ARCH='64'
+  else
+    ARCH='32'
+  fi
 fi
 
 # will display make, type, and model number
@@ -40,21 +48,24 @@ fi
 
 
 # Virtual cores / logical cores
-LOGICAL_CORES=`cat /proc/cpuinfo | grep processor | wc -l`
+LOGICAL_CORES=$(cat /proc/cpuinfo | grep processor | wc -l)
 # Amount of RAM needed to run all copies of SPEC
-REQUIRED_RAM=`expr $LOGICAL_CORES \* 2`
+REQUIRED_RAM=$(expr $LOGICAL_CORES \* 2)
 # Get RAM in KB
-RAM_KB=`cat /proc/meminfo | grep "MemTotal:      " | sed "s/MemTotal:      //g" | tr -d ' ' | sed "s/kB//g"`
+RAM_KB=$(cat /proc/meminfo | grep "MemTotal:      " | sed "s/MemTotal:      //g" | tr -d ' ' | sed "s/kB//g")
 # Convert RAM to GB
-RAM_GB=`expr $RAM_KB / 1024 / 1024`
+RAM_GB=$(expr $RAM_KB / 1024 / 1024)
 # if more RAM than required
 if [[ $RAM_GB > $REQUIRED_RAM ]]; then
   COPIES=$LOGICAL_CORES
 else
-  COPIES=`expr $RAM_GB / 2`
+  COPIES=$(expr $RAM_GB / 2)
 fi
 
-MARCH=`gcc -march=native -Q --help=target | grep march`
+MARCH=$(gcc -march=native -Q --help=target | grep march)
+if [[ $CPU == *'AArch'* ]]; then
+  MARCH='armv8-a'
+fi
 
 if [[ $CPU == *'Intel'* ]]; then
   PROCESSOR_OPTION='1'
@@ -64,16 +75,16 @@ if [[ $CPU == *'Intel'* ]]; then
       INT_COMMAND='runspec --config '$GCC_CONFIG' --machine corei7-avx2 --rate --reportable int'
       FP_COMMAND='runspec --config '$GCC_CONFIG' --machine corei7-avx2 --rate --reportable fp'
     else
-    INT_COMMAND='runspec --config '$GCC_CONFIG' --machine corei7-avx2 --rate --copies '$COPIES' --reportable int'
-    FP_COMMAND='runspec --config '$GCC_CONFIG' --machine corei7-avx2 --rate --copies '$COPIES' --reportable fp'
+      INT_COMMAND='runspec --config '$GCC_CONFIG' --machine corei7-avx2 --rate --copies '$COPIES' --reportable int'
+      FP_COMMAND='runspec --config '$GCC_CONFIG' --machine corei7-avx2 --rate --copies '$COPIES' --reportable fp'
     fi
   elif [[ $MARCH == *'corei7-avx'* ]]; then
     if [ $COPIES -le 0 ]; then
       INT_COMMAND='runspec --config '$GCC_CONFIG' --machine corei7-avx --rate --reportable int'
       FP_COMMAND='runspec --config '$GCC_CONFIG' --machine corei7-avx --rate --reportable fp'
     else
-    INT_COMMAND='runspec --config '$GCC_CONFIG' --machine corei7-avx --rate --copies '$COPIES' --reportable int'
-    FP_COMMAND='runspec --config '$GCC_CONFIG' --machine corei7-avx --rate --copies '$COPIES' --reportable fp'
+      INT_COMMAND='runspec --config '$GCC_CONFIG' --machine corei7-avx --rate --copies '$COPIES' --reportable int'
+      FP_COMMAND='runspec --config '$GCC_CONFIG' --machine corei7-avx --rate --copies '$COPIES' --reportable fp'
     fi
   elif [[ $MARCH == *'corei7'* ]]; then
     if [ $COPIES -le 0 ]; then
@@ -92,7 +103,7 @@ if [[ $CPU == *'Intel'* ]]; then
       FP_COMMAND='runspec --config '$GCC_CONFIG' --machine native --rate --reportable fp'
     fi
   fi
-elif [[ $CPU == *'ARM'* ]]; then
+elif [[ $CPU == *'ARM'* ]] || [[ $CPU == *'AArch'* ]]; then
   PROCESSOR_OPTION='3'
   GCC_CONFIG='lnx-arm-gcc.cfg'
   if [[ $MARCH == *'a15'* ]] || [[ $MARCH == *'armv7-a'* ]]; then
@@ -103,15 +114,21 @@ elif [[ $CPU == *'ARM'* ]]; then
       INT_COMMAND='runspec --config '$GCC_CONFIG' --machine a15_neon_hard --rate --copies '$COPIES' --reportable int'
       FP_COMMAND='runspec --config '$GCC_CONFIG' --machine a15_neon_hard --rate --copies '$COPIES' --reportable fp'
     fi
-  else
-    PROCESSOR_OPTION='3'
-    GCC_CONFIG='lnx-arm-gcc.cfg'
+  elif [[ $MARCH == *'armv8-a'* ]]; then
     if [ $COPIES -le 0 ]; then
-      INT_COMMAND='runspec --config '$GCC_CONFIG' --machine a15_neon_hard --rate --reportable int'
-      FP_COMMAND='runspec --config '$GCC_CONFIG' --machine a15_neon_hard --rate --reportable fp'
+      INT_COMMAND='runspec --config '$GCC_CONFIG' --machine v8 --rate --reportable int'
+      FP_COMMAND='runspec --config '$GCC_CONFIG' --machine v8 --rate --reportable fp'
     else
-      INT_COMMAND='runspec --config '$GCC_CONFIG' --machine a15_neon_hard --rate --copies '$COPIES' --reportable int'
-      FP_COMMAND='runspec --config '$GCC_CONFIG' --machine a15_neon_hard --rate --copies '$COPIES' --reportable fp'
+      INT_COMMAND='runspec --config '$GCC_CONFIG' --machine v8 --rate --copies '$COPIES' --reportable int'
+      FP_COMMAND='runspec --config '$GCC_CONFIG' --machine v8 --rate --copies '$COPIES' --reportable fp'
+    fi
+  else
+    if [ $COPIES -le 0 ]; then
+      INT_COMMAND='runspec --config '$GCC_CONFIG' --machine generic --rate --reportable int'
+      FP_COMMAND='runspec --config '$GCC_CONFIG' --machine generic --rate --reportable fp'
+    else
+      INT_COMMAND='runspec --config '$GCC_CONFIG' --machine generic --rate --copies '$COPIES' --reportable int'
+      FP_COMMAND='runspec --config '$GCC_CONFIG' --machine generic --rate --copies '$COPIES' --reportable fp'
     fi
   fi
 else
@@ -161,20 +178,34 @@ echo "*************************************************************************"
 # install prereqs
 echo "Checking if prerequisites need to be installed and installing if necessary..."
 
+
+
 # if apt-get is installed
 if hash apt-get; then
-  sudo apt-get install build-essential -y
-  sudo apt-get install numactl -y
+  sudo -E apt-get update -y
+  sudo -E apt-get upgrade -y
+  sudo -E apt-get install build-essential -y
+  sudo -E apt-get install numactl -y
   # double check
-  sudo apt-get install gcc -y
-  sudo apt-get install g++ -y
-  sudo apt-get install gfortran -y
+  sudo -E apt-get install gcc -y
+  sudo -E apt-get install g++ -y
+  sudo -E apt-get install gfortran -y
+  sudo -E apt-get install automake -y
+  # arm
+  if [ '$PROCESSOR_OPTION' != '3' ]; then
+    sudo -E apt-get install gcc-4.8-arm-linux-gnueabi
+  fi
   wait
 else
-  sudo yum install gcc -y
-  sudo yum install g++ -y
-  sudo yum install gfortran -y
-  sudo yum install numactl -y
+  sudo -E yum update -y
+  sudo -E yum install gcc -y
+  sudo -E yum install g++ -y
+  sudo -E yum install gfortran -y
+  sudo -E yum install numactl -y
+  sudo -E yum install automake -y
+  if [ '$PROCESSOR_OPTION' != '3' ]; then
+    sudo -E yum install gcc-4.8-arm-linux-gnueabi
+  fi
   wait
 fi
 
@@ -204,9 +235,9 @@ if [ ! -d "SPECCPU" ]; then
     export FORCE_UNSAFE_CONFIGURE=1
     cd tools/src
     echo "Patching..."
-    sed -i '/infd = open(tmpfile, O_RDWR|O_CREAT|O_TRUNC);/infd = open(tmpfile, O_RDWR|O_CREAT|O_TRUNC, 0666);/' specinvoke/unix.c
-    sed -i '/$startsh/$startsh -x/' perl-5.12.3/makedepend.SH
-    sed -i '/$startsh -x/a set -x/' perl-5.12.3/makedepend.SH
+    sed -i 's/infd = open(tmpfile, O_RDWR|O_CREAT|O_TRUNC);/infd = open(tmpfile, O_RDWR|O_CREAT|O_TRUNC, 0666);/g' specinvoke/unix.c
+    sed -i 's/$startsh/$startsh -x/g' perl-5.12.3/makedepend.SH
+    sed -i 's/$startsh -x/a set -x/g' perl-5.12.3/makedepend.SH
     touch setup.sh
     # write multi-line setup file
     cat >setup.sh <<EOL
@@ -221,20 +252,34 @@ export CFLAGS="-O2 -march=native -mtune=native"
 echo $CFLAGS
 ./buildtools
 EOL
-    chmod +x setup.sh
-    ./setup.sh
-    # if error
-    if [ "$?"-ne 0]; then 
-      sed -i 's/_GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");//g' tar-1.25/gnu/stdio.in.h
-      
-      sed -i 's/_GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");//g' specsum/gnulib/stdio.in.h
-      
-      sed -i 's/_GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");//g' tar-1.25/mingw/stdio.h
-      
-      sed -i 's/_GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");//g' specsum/win32/stdio.h
+    # if ARMv8 (64 bit)
+    if [[ $CPU == *'AArch'* ]]; then
+      sed -i 's/march=native/march='$MARCH'/g' setup.sh
     fi
-    exit 
+
+    chmod +x setup.sh
+    # update the config.guess files
+    chmod 775 ../../../arm/config.guess
+    while IFS= read -d $'\0' -r guess_file ; do
+      printf 'Updating config.guess file: %s\n' "$guess_file"
+      cp ../../../arm/config.guess $guess_file
+    done < <(find . -iname 'config.guess' -print0)
     wait
+
+    # should display nothing
+    ./setup.sh
+    wait
+
+    # fix errors if they happen then rerun
+    if [ "$?"-ne 0]; then 
+      while IFS= read -d $'\0' -r gl_warn_file ; do
+        printf 'File found: %s\n' "$gl_warn_file"
+        sed -i 's/_GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");//g' $gl_warn_file
+      done < <(find . -type f -exec grep -H '_GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");' {} +)
+      wait
+      ./setup.sh
+      wait
+    fi
   fi
 else
   # if SPECCPU is extracted

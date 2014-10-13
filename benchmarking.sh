@@ -192,7 +192,7 @@ if hash apt-get; then
   sudo -E apt-get install gfortran -y
   sudo -E apt-get install automake -y
   # arm
-  if [ '$PROCESSOR_OPTION' != '3' ]; then
+  if [ '$PROCESSOR_OPTION' == '3' ]; then
     sudo -E apt-get install gcc-4.8-arm-linux-gnueabi
   fi
   wait
@@ -203,7 +203,7 @@ else
   sudo -E yum install gfortran -y
   sudo -E yum install numactl -y
   sudo -E yum install automake -y
-  if [ '$PROCESSOR_OPTION' != '3' ]; then
+  if [ '$PROCESSOR_OPTION' == '3' ]; then
     sudo -E yum install gcc-4.8-arm-linux-gnueabi
   fi
   wait

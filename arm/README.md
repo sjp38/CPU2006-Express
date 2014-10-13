@@ -12,7 +12,6 @@ Contents
 + [Project Main Page](/)
 
 
-
 Setup
 -----
 
@@ -143,21 +142,37 @@ Notes:
 ------
 
 
-I had build issues is I forgot to set the current system time / date
+I had build issues when forgetting to set the current system's date and time.
 
 
 Errors:
 -------
 
 
+`checking build system type... config/config.guess: unable to guess system type`
+
+I fixed this error by updating the CPU2006's config.guess files with the located current version  [here](http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.guess;hb=HEAD).
+
+To file the config.guess files:
+
+```bash
+find . -iname 'config.guess' -print0
+```
+
+Then copy your new config.guess file to those locations.
+
+
+---------------------------------------
+
+
 `_GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");`
 
 I fixed this error by deleting this line in all files that contained it.
 
-To find the files:
+To find the files with `_GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");`:
 
 ```bash
-find ./ -type f -exec grep -H '_GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");' {} +
+find . -type f -exec grep -H '_GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");' {} +
 ```
 
 To remove the line:

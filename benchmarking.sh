@@ -54,7 +54,8 @@ REQUIRED_RAM=$(expr $LOGICAL_CORES \* 2)
 # Get RAM in KB
 RAM_KB=$(cat /proc/meminfo | grep "MemTotal:      " | sed "s/MemTotal:      //g" | tr -d ' ' | sed "s/kB//g")
 # Convert RAM to GB
-RAM_GB=$(expr $RAM_KB / 1024 / 1024)
+# Rounds down if you divide by 1024, so switched to 1000
+RAM_GB=$(expr $RAM_KB / 1000 / 1000)
 # if more RAM than required
 if [[ $RAM_GB > $REQUIRED_RAM ]]; then
   COPIES=$LOGICAL_CORES
@@ -91,16 +92,16 @@ if [[ $CPU == *'Intel'* ]]; then
       INT_COMMAND='runspec --config '$GCC_CONFIG' --machine corei7 --rate --reportable int'
       FP_COMMAND='runspec --config '$GCC_CONFIG' --machine corei7 --rate --reportable fp'
     else
-      INT_COMMAND='runspec --config '$GCC_CONFIG' --machine corei7 --rate --reportable int'
-      FP_COMMAND='runspec --config '$GCC_CONFIG' --machine corei7 --rate --reportable fp'
+      INT_COMMAND='runspec --config '$GCC_CONFIG' --machine corei7 --rate --copies '$COPIES' --reportable int'
+      FP_COMMAND='runspec --config '$GCC_CONFIG' --machine corei7 --rate --copies '$COPIES' --reportable fp'
     fi
   else
     if [ $COPIES -le 0 ]; then
       INT_COMMAND='runspec --config '$GCC_CONFIG' --machine native --rate --reportable int'
       FP_COMMAND='runspec --config '$GCC_CONFIG' --machine native --rate --reportable fp'
     else
-      INT_COMMAND='runspec --config '$GCC_CONFIG' --machine native --rate --reportable int'
-      FP_COMMAND='runspec --config '$GCC_CONFIG' --machine native --rate --reportable fp'
+      INT_COMMAND='runspec --config '$GCC_CONFIG' --machine native --rate --copies '$COPIES' --reportable int'
+      FP_COMMAND='runspec --config '$GCC_CONFIG' --machine native --rate --copies '$COPIES' --reportable fp'
     fi
   fi
 elif [[ $CPU == *'ARM'* ]] || [[ $CPU == *'AArch'* ]]; then
@@ -158,7 +159,7 @@ echo "GCC INT command:    $INT_COMMAND"
 echo "GCC FP command:     $FP_COMMAND"
 echo 
 echo "******************************* Warnings ********************************"
-if [[ $RAM_GB > $REQUIRED_RAM ]]; then
+if [[ $RAM_GB -ge $REQUIRED_RAM ]]; then
   echo "None"
 else
   echo "The number of copies has been changed from $LOGICAL_CORES to $COPIES because there isn't"

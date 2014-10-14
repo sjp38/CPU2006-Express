@@ -14,6 +14,7 @@ Contents:
 + [Usage](#useage)
 + [Troubleshooting](#troubleshooting)
 + [Optimizing GCC Process](#process-for-optimizing-gcc)
++ [Building SPEC CPU2006 on ARM](/arm/README.md)
 
 
 Structure:

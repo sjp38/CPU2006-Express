@@ -36,7 +36,7 @@ if [ -f /etc/lsb-release ]; then
   OS=$DISTRIB_ID
   VER=$DISTRIB_RELEASE
 elif [ -f /etc/debian_version ]; then
-  OS='Debian'  # XXX or Ubuntu??
+  OS='Debian'
   VER=$(cat /etc/debian_version)
 elif [ -f /etc/redhat-release ]; then
   OS='Redhat'
@@ -54,7 +54,6 @@ REQUIRED_RAM=$(expr $LOGICAL_CORES \* 2)
 # Get RAM in KB
 RAM_KB=$(cat /proc/meminfo | grep "MemTotal:      " | sed "s/MemTotal:      //g" | tr -d ' ' | sed "s/kB//g")
 # Convert RAM to GB
-# Rounds down if you divide by 1024, so switched to 1000
 RAM_GB=$(expr $RAM_KB / 1000 / 1000)
 # if more RAM than required
 if [[ $RAM_GB > $REQUIRED_RAM ]]; then
@@ -174,50 +173,54 @@ read
 
 echo "*************************************************************************"
 
-
-
-# install prereqs
-echo "Checking if prerequisites need to be installed and installing if necessary..."
-
-# put proxies here
-# example:
-# export http_proxy=http://proxy.ryanspoone.com:88
-
-# if apt-get is installed
-if hash apt-get; then
-  sudo -E apt-get update -y
-  sudo -E apt-get upgrade -y
-  sudo -E apt-get install build-essential -y
-  sudo -E apt-get install numactl -y
-  # double check
-  sudo -E apt-get install gcc -y
-  sudo -E apt-get install g++ -y
-  sudo -E apt-get install gfortran -y
-  sudo -E apt-get install automake -y
-  # arm
-  if [ '$PROCESSOR_OPTION' == '3' ]; then
-    sudo -E apt-get install gcc-4.8-arm-linux-gnueabi
-  fi
-  wait
-else
-  sudo -E yum update -y
-  sudo -E yum install gcc -y
-  sudo -E yum install g++ -y
-  sudo -E yum install gfortran -y
-  sudo -E yum install numactl -y
-  sudo -E yum install automake -y
-  if [ '$PROCESSOR_OPTION' == '3' ]; then
-    sudo -E yum install gcc-4.8-arm-linux-gnueabi
-  fi
-  wait
-fi
-
 echo "*************************************************************************"
 
 # install cpu2006 if needed
 echo "Checking if CPU2006 needs to be installed and installing if necessary..."
 
 if [ ! -d "SPECCPU" ]; then
+  # install prereqs
+  echo "Checking if prerequisites need to be installed and installing if necessary..."
+  # add proxies here
+  # example:
+  # export http_proxy=http://proxy-us.ryanspoone.com:88
+
+  # if apt-get is installed
+  if hash apt-get; then
+    sudo -E apt-get update -y
+    sudo -E apt-get upgrade -y
+    sudo -E apt-get install build-essential -y
+    sudo -E apt-get install numactl -y
+    # double check
+    sudo -E apt-get install gcc -y
+    sudo -E apt-get install g++ -y
+    sudo -E apt-get install gfortran -y
+    sudo -E apt-get install automake -y
+    # arm
+    if [ '$PROCESSOR_OPTION' == '3' ]; then
+      sudo -E apt-get install gcc-4.8-arm-linux-gnueabi
+      if [[ $MARCH == *'armv8-a'* ]]; then
+        sudo -E apt-get build-dep gcc-4.8-arm-linux-gnueabihf-base
+        sudo -E apt-get build-dep binutils-aarch64-linux-gnu
+      fi
+    fi
+    wait
+  else
+    sudo -E yum check-update -y
+    sudo -E yum update -y
+    sudo -E yum install gcc -y
+    sudo -E yum install g++ -y
+    sudo -E yum install gfortran -y
+    sudo -E yum install numactl -y
+    sudo -E yum install automake -y
+    if [ '$PROCESSOR_OPTION' == '3' ]; then
+      sudo -E yum install gcc-4.8-arm-linux-gnueabi
+      if [[ $MARCH == *'armv8-a'* ]]; then
+        sudo -E yum-builddep gcc-4.8-arm-linux-gnueabihf-base
+        sudo -E yum-builddep binutils-aarch64-linux-gnu
+      fi
+    fi
+  fi
   # if SPECCPU is not extracted
   echo "Extracting SPECCPU..."
   tar xf SPECCPU.tar
@@ -245,16 +248,16 @@ PERLFLAGS="\$PERLFLAGS -Aplibpth=\$i"
 done
 export PERLFLAGS
 echo $PERLFLAGS
-export CFLAGS="-Ofast -march=native"
+export CFLAGS="-O2 -march=native"
 echo $CFLAGS
 ./buildtools
 EOL
-    # if ARMv8 (64 bit)
-    if [[ $CPU == *'AArch'* ]]; then
-      sed -i 's/march=native/march='$MARCH'/g' setup.sh
-    fi
+
+    # change architecture tuning
+    sed -i 's/march=native/march='$MARCH'/g' setup.sh
 
     chmod +x setup.sh
+
     # update the config.guess files
     chmod 775 ../../../arm/config.guess
     while IFS= read -d $'\0' -r guess_file ; do
@@ -268,27 +271,52 @@ EOL
       printf 'Fixing _GL_WARN_ON_USE errors: %s\n' "$gl_warn_file"
       sed -i 's/_GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");//g' $gl_warn_file
     done
-    
+
     # build
     ./setup.sh
     wait
     cd ../..
     source shrc
-    wait
     cp ../config/*.cfg $SPEC/config/
   else
     ./install.sh <<< "yes"
     wait
     source shrc
     wait
+    echo "Extracting ICC files..."
+    tar xf 'cpu2006.1.2.ic14.0.linux64.for.intel.16jan2014.tar.xz'
+    wait
+    source numa-detection.sh
+    wait
+    ulimit -s unlimited
+    wait 
+    rm -rf topo.txt
+    specperl nhmtopology.pl
+    wait
+    DEVICE=$(cat topo.txt)
     cp ../config/*.cfg $SPEC/config/
   fi
 else
   # if SPECCPU is extracted
-  cd SPECCPU
-  source shrc
+  if [ "$PROCESSOR_OPTION" == "3" ]; then
+    cd SPECCPU
+    source shrc
+  else
+    cd SPECCPU
+    source shrc
+    source numa-detection.sh
+    wait
+    ulimit -s unlimited
+    wait 
+    rm -rf topo.txt
+    specperl nhmtopology.pl
+    wait
+    DEVICE=$(cat topo.txt)
+  fi
 fi
+
 wait
+
 echo "*************************************************************************"
 
 # check if in SPECCPU directory  
@@ -307,15 +335,14 @@ eval $INT_COMMAND
 wait
 
 # try/catch
-GCC_FULL_INT_FILE=`ls -t $SPEC/result/*.html | head -1`; 
-GCC_FULL_INT_OUT=`cat $GCC_FULL_INT_FILE | grep -o -P '(?<=base:).*(?=\")'`;
+GCC_FULL_INT_FILE=$(ls -t $SPEC/result/*.html | head -1)
+GCC_FULL_INT_OUT=$(cat $GCC_FULL_INT_FILE | grep -o -P '(?<=base:).*(?=\")')
 $GCC_FULL_INT_OUT 2>/dev/null
 
-# if error
 if (( $? == 0 )); then
     echo "RESULTS: base:"$GCC_FULL_INT_OUT
 else
-    GCC_FULL_INT_LOG=`ls -t $SPEC/result/*.log | head -1`
+    GCC_FULL_INT_LOG=$(ls -t $SPEC/result/*.log | head -1)
     echo "There was an error and no results were made. Please check the log file for more info: "$GCC_FULL_INT_LOG
 fi 
 
@@ -327,15 +354,14 @@ eval $FP_COMMAND
 wait
 
 # try/catch
-GCC_FULL_FP_FILE=`ls -t $SPEC/result/*.html | head -1`; 
-GCC_FULL_FP_OUT=`cat $GCC_FULL_FP_FILE | grep -o -P '(?<=base:).*(?=\")'`;
+GCC_FULL_FP_FILE=$(ls -t $SPEC/result/*.html | head -1)
+GCC_FULL_FP_OUT=$(cat $GCC_FULL_FP_FILE | grep -o -P '(?<=base:).*(?=\")')
 $GCC_FULL_FP_OUT 2>/dev/null
 
-# if error
 if (( $? == 0 )); then
     echo "RESULTS: base:"$GCC_FULL_FP_OUT
 else
-    GCC_FULL_FP_LOG=`ls -t $SPEC/result/*.log | head -1`
+    GCC_FULL_FP_LOG=$(ls -t $SPEC/result/*.log | head -1)
     echo "There was an error and no results were made. Please check the log file for more info: "$GCC_FULL_FP_LOG
 fi
 

@@ -234,7 +234,7 @@ if [ ! -d "SPECCPU" ]; then
     echo "Patching..."
     sed -i 's/tmpfile, O_RDWR|O_CREAT|O_TRUNC/tmpfile, O_RDWR|O_CREAT|O_TRUNC, 0666/g' specinvoke/unix.c
     sed -i 's/$startsh/$startsh -x/g' perl-5.12.3/makedepend.SH
-    sed -i 's/$startsh -x/a set -x/g' perl-5.12.3/makedepend.SH
+    sed -i 's/$startsh -x/&\nset -x/' perl-5.12.3/makedepend.SH
     touch setup.sh
     # write multi-line setup file
     cat >setup.sh <<EOL

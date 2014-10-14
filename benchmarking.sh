@@ -251,7 +251,7 @@ PERLFLAGS="\$PERLFLAGS -Aplibpth=\$i"
 done
 export PERLFLAGS
 echo $PERLFLAGS
-export CFLAGS="-O2 -march=native -mtune=native"
+export CFLAGS="-Ofast -march=native"
 echo $CFLAGS
 ./buildtools
 EOL

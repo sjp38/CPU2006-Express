@@ -312,7 +312,7 @@ GCC_FULL_INT_OUT=`cat $GCC_FULL_INT_FILE | grep -o -P '(?<=base:).*(?=\")'`;
 $GCC_FULL_INT_OUT 2>/dev/null
 
 # if error
-if [ "$?" -ne 0 ]; then 
+if (( $? == 0 )); then
     echo "RESULTS: base:"$GCC_FULL_INT_OUT
 else
     GCC_FULL_INT_LOG=`ls -t $SPEC/result/*.log | head -1`
@@ -332,7 +332,7 @@ GCC_FULL_FP_OUT=`cat $GCC_FULL_FP_FILE | grep -o -P '(?<=base:).*(?=\")'`;
 $GCC_FULL_FP_OUT 2>/dev/null
 
 # if error
-if [ "$?" -ne 0 ]; then 
+if (( $? == 0 )); then
     echo "RESULTS: base:"$GCC_FULL_FP_OUT
 else
     GCC_FULL_FP_LOG=`ls -t $SPEC/result/*.log | head -1`

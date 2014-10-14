@@ -9,6 +9,7 @@ Contents
 + [Final Script](#create-script)
 + [Side Notes](#notes)
 + [Common Errors](#errors)
++ [All In One Script](#all-in-one-script)
 + [Project Main Page](/)
 
 
@@ -185,4 +186,61 @@ sed -i 's/_GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");
 sed -i 's/_GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");//g' tar-1.25/mingw/stdio.h
 
 sed -i 's/_GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");//g' specsum/win32/stdio.h
+```
+
+All In One Script:
+------------------
+
+```bash
+cd ~/SPECCPU/tools/src
+
+CPU=$(grep 'Processor' /proc/cpuinfo | uniq | sed 's/Processor\s*:\s//g' | sed 's/\s@\s*.*//g' | sed 's/([^)]*)//g' | sed 's/CPU\s*//g')
+
+MARCH=$(gcc -march=native -Q --help=target | grep march)
+if [[ $CPU == *'AArch'* ]]; then
+  MARCH='armv8-a'
+fi
+
+export FORCE_UNSAFE_CONFIGURE=1
+echo "Patching..."
+sed -i 's/tmpfile, O_RDWR|O_CREAT|O_TRUNC/tmpfile, O_RDWR|O_CREAT|O_TRUNC, 0666/g' specinvoke/unix.c
+sed -i 's/$startsh/$startsh -x/g' perl-5.12.3/makedepend.SH
+sed -i 's/$startsh -x/&\nset -x/' perl-5.12.3/makedepend.SH
+touch setup.sh
+# write multi-line setup file
+cat >setup.sh <<EOL
+#!/bin/bash
+PERLFLAGS=-Uplibpth=
+for i in \`gcc -print-search-dirs | grep libraries | cut -f2- -d= | tr ':' '\\n' | grep -v /gcc\`; do
+PERLFLAGS="\$PERLFLAGS -Aplibpth=\$i"
+done
+export PERLFLAGS
+echo $PERLFLAGS
+export CFLAGS="-O2 -march=native"
+echo $CFLAGS
+./buildtools
+EOL
+
+# change architecture tuning
+sed -i 's/march=native/march='$MARCH'/g' setup.sh
+
+chmod +x setup.sh
+# update the config.guess files
+chmod 775 ../../../arm/config.guess
+while IFS= read -d $'\0' -r guess_file ; do
+  printf 'Updating config.guess file: %s\n' "$guess_file"
+  cp ../../../arm/config.guess $guess_file
+done < <(find . -iname 'config.guess' -print0)
+wait
+
+# fix errors
+find . -type f -exec grep -H '_GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");' {} + | awk '{print $1;}' | sed 's/:_GL_WARN_ON_USE//g' | while read -r gl_warn_file; do 
+  printf 'Fixing _GL_WARN_ON_USE errors: %s\n' "$gl_warn_file"
+  sed -i 's/_GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");//g' $gl_warn_file
+done
+
+wait
+read
+./setup.sh
+wait
 ```

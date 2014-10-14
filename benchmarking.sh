@@ -227,7 +227,7 @@ if [ ! -d "SPECCPU" ]; then
   wait
   cd SPECCPU
   echo "Extracting cpu2006..."
-  tar xf cpu2006-1.2.tar.xz
+  tar xf cpu2006-*.tar.xz
   wait
   if [ "$PROCESSOR_OPTION" == "3" ]; then
     # for ARM
@@ -283,36 +283,12 @@ EOL
     wait
     source shrc
     wait
-    echo "Extracting ICC files..."
-    tar xf 'cpu2006.1.2.ic14.0.linux64.for.intel.16jan2014.tar.xz'
-    wait
-    source numa-detection.sh
-    wait
-    ulimit -s unlimited
-    wait 
-    rm -rf topo.txt
-    specperl nhmtopology.pl
-    wait
-    DEVICE=$(cat topo.txt)
     cp ../config/*.cfg $SPEC/config/
   fi
 else
   # if SPECCPU is extracted
-  if [ "$PROCESSOR_OPTION" == "3" ]; then
-    cd SPECCPU
-    source shrc
-  else
-    cd SPECCPU
-    source shrc
-    source numa-detection.sh
-    wait
-    ulimit -s unlimited
-    wait 
-    rm -rf topo.txt
-    specperl nhmtopology.pl
-    wait
-    DEVICE=$(cat topo.txt)
-  fi
+  cd SPECCPU
+  source shrc
 fi
 
 wait

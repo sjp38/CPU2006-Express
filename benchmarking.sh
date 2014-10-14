@@ -179,7 +179,9 @@ echo "*************************************************************************"
 # install prereqs
 echo "Checking if prerequisites need to be installed and installing if necessary..."
 
-
+# put proxies here
+# example:
+# export http_proxy=http://proxy.ryanspoone.com:88
 
 # if apt-get is installed
 if hash apt-get; then
@@ -236,7 +238,7 @@ if [ ! -d "SPECCPU" ]; then
     export FORCE_UNSAFE_CONFIGURE=1
     cd tools/src
     echo "Patching..."
-    sed -i 's/infd = open(tmpfile, O_RDWR|O_CREAT|O_TRUNC);/infd = open(tmpfile, O_RDWR|O_CREAT|O_TRUNC, 0666);/g' specinvoke/unix.c
+    sed -i 's/tmpfile, O_RDWR|O_CREAT|O_TRUNC/tmpfile, O_RDWR|O_CREAT|O_TRUNC, 0666/g' specinvoke/unix.c
     sed -i 's/$startsh/$startsh -x/g' perl-5.12.3/makedepend.SH
     sed -i 's/$startsh -x/a set -x/g' perl-5.12.3/makedepend.SH
     touch setup.sh
@@ -267,20 +269,17 @@ EOL
     done < <(find . -iname 'config.guess' -print0)
     wait
 
-    # should display nothing
+    # fix errors
+    find . -type f -exec grep -H '_GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");' {} + | awk '{print $1;}' | sed 's/:_GL_WARN_ON_USE//g' | while read -r gl_warn_file; do 
+      printf 'Fixing _GL_WARN_ON_USE errors: %s\n' "$gl_warn_file"
+      sed -i 's/_GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");//g' $gl_warn_file
+    done
+    
+    # build
     ./setup.sh
     wait
-
-    # fix errors if they happen then rerun
-    if [ "$?"-ne 0]; then 
-      while IFS= read -d $'\0' -r gl_warn_file ; do
-        printf 'File found: %s\n' "$gl_warn_file"
-        sed -i 's/_GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");//g' $gl_warn_file
-      done < <(find . -type f -exec grep -H '_GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");' {} +)
-      wait
-      ./setup.sh
-      wait
-    fi
+    cd ../..
+    source shrc
   fi
 else
   # if SPECCPU is extracted

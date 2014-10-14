@@ -76,10 +76,9 @@ chmod +x benchmarking.sh
 Process for optimizing GCC:
 ===========================
 
-1. Get GCC capable flags: `gcc -march=native -Q --help=target` or `echo "int main {return 0;}" | gcc [OPTIONS] -x c -v -Q -`
-
+1. Get GCC capable flags: 
+  - `gcc -march=native -Q --help=target`
+  - `echo "int main {return 0;}" | gcc [OPTIONS] -x c -v -Q -`
 2. For Intel processors, go to [ARK](http://ark.intel.com/) to get CPU information and fill in hw_* information. Else, search for the hardware information on the Web.
-
 3. Check [SPEC CPU2006](http://www.spec.org/cgi-bin/osgresults?conf=rint2006) for submitted results.
-
 4. Trial and error.

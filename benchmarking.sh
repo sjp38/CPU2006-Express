@@ -226,13 +226,7 @@ if [ ! -d "SPECCPU" ]; then
   echo "Extracting cpu2006..."
   tar xf cpu2006-1.2.tar.xz
   wait
-  if [ '$PROCESSOR_OPTION' != '3' ]; then
-    ./install.sh <<< "yes"
-    wait
-    source shrc
-    wait
-    cp ../config/*.cfg $SPEC/config/
-  else
+  if [ "$PROCESSOR_OPTION" == "3" ]; then
     # for ARM
     echo "Building for ARM..."
     export FORCE_UNSAFE_CONFIGURE=1
@@ -280,6 +274,14 @@ EOL
     wait
     cd ../..
     source shrc
+    wait
+    cp ../config/*.cfg $SPEC/config/
+  else
+    ./install.sh <<< "yes"
+    wait
+    source shrc
+    wait
+    cp ../config/*.cfg $SPEC/config/
   fi
 else
   # if SPECCPU is extracted

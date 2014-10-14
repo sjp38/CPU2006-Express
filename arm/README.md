@@ -153,7 +153,7 @@ Errors:
 
 I fixed this error by updating the CPU2006's config.guess files with the located current version  [here](http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.guess;hb=HEAD).
 
-To file the config.guess files:
+To find the config.guess files:
 
 ```bash
 find . -iname 'config.guess' -print0

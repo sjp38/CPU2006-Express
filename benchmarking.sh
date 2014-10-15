@@ -36,7 +36,7 @@ if [ -f /etc/lsb-release ]; then
   OS=$DISTRIB_ID
   VER=$DISTRIB_RELEASE
 elif [ -f /etc/debian_version ]; then
-  OS='Debian'
+  OS='Debian'  # XXX or Ubuntu??
   VER=$(cat /etc/debian_version)
 elif [ -f /etc/redhat-release ]; then
   OS='Redhat'
@@ -115,6 +115,7 @@ elif [[ $CPU == *'ARM'* ]] || [[ $CPU == *'AArch'* ]]; then
       FP_COMMAND='runspec --config '$GCC_CONFIG' --machine a15_neon_hard --rate --copies '$COPIES' --reportable fp'
     fi
   elif [[ $MARCH == *'armv8-a'* ]]; then
+    GCC_CONFIG='lnx-arm64-gcc.cfg'
     if [ $COPIES -le 0 ]; then
       INT_COMMAND='runspec --config '$GCC_CONFIG' --machine v8 --rate --reportable int'
       FP_COMMAND='runspec --config '$GCC_CONFIG' --machine v8 --rate --reportable fp'
@@ -181,9 +182,8 @@ echo "Checking if CPU2006 needs to be installed and installing if necessary..."
 if [ ! -d "SPECCPU" ]; then
   # install prereqs
   echo "Checking if prerequisites need to be installed and installing if necessary..."
-  # add proxies here
-  # example:
-  # export http_proxy=http://proxy-us.ryanspoone.com:88
+  #export http_proxy=http://proxy-us.test.com:911
+  #export https_proxy=http://proxy-us.test.com:911
 
   # if apt-get is installed
   if hash apt-get; then
@@ -198,10 +198,29 @@ if [ ! -d "SPECCPU" ]; then
     sudo -E apt-get install automake -y
     # arm
     if [ '$PROCESSOR_OPTION' == '3' ]; then
-      sudo -E apt-get install gcc-4.8-arm-linux-gnueabi
+      sudo -E apt-get install gcc-4.8-arm-linux-gnueabi -y
       if [[ $MARCH == *'armv8-a'* ]]; then
-        sudo -E apt-get build-dep gcc-4.8-arm-linux-gnueabihf-base
-        sudo -E apt-get build-dep binutils-aarch64-linux-gnu
+        sudo -E apt-get build-dep crossbuild-essential-arm64 -y
+        sudo -E apt-get build-dep gcc-4.8-arm-linux-gnueabihf-base -y
+        sudo -E apt-get build-dep binutils-aarch64-linux-gnu -y
+
+        # update to 4.9
+        sudo -E add-apt-repository ppa:ubuntu-toolchain-r/test -y
+        sudo -E apt-get update -y
+        sudo -E apt-get install gcc-4.9 -y
+        sudo -E apt-get install g++-4.9 -y
+        sudo -E apt-get install gfortran-4.9 -y
+        # Remove the previous gcc version from the default applications list (if already exists)
+        sudo update-alternatives --remove-all gcc
+        sudo update-alternatives --remove-all g++
+        sudo update-alternatives --remove-all gfortran
+        # Make GCC 4.9 the default compiler on the system
+        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.9 20
+        sudo update-alternatives --config gcc
+        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.9 20
+        sudo update-alternatives --config g++
+        sudo update-alternatives --install /usr/bin/gfortran gfortran /usr/bin/gfortran-4.9 20
+        sudo update-alternatives --config gfortran
       fi
     fi
     wait
@@ -227,7 +246,7 @@ if [ ! -d "SPECCPU" ]; then
   wait
   cd SPECCPU
   echo "Extracting cpu2006..."
-  tar xf cpu2006-*.tar.xz
+  tar xf cpu2006-1.2.tar.xz
   wait
   if [ "$PROCESSOR_OPTION" == "3" ]; then
     # for ARM
@@ -266,6 +285,14 @@ EOL
     done < <(find . -iname 'config.guess' -print0)
     wait
 
+    # update the config.sub files
+    chmod 775 ../../../arm/config.sub
+    while IFS= read -d $'\0' -r sub_file ; do
+      printf 'Updating config.sub file: %s\n' "$sub_file"
+      cp ../../../arm/config.sub $sub_file
+    done < <(find . -iname 'config.sub' -print0)
+    wait
+
     # fix errors
     find . -type f -exec grep -H '_GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");' {} + | awk '{print $1;}' | sed 's/:_GL_WARN_ON_USE//g' | while read -r gl_warn_file; do 
       printf 'Fixing _GL_WARN_ON_USE errors: %s\n' "$gl_warn_file"
@@ -282,7 +309,6 @@ EOL
     ./install.sh <<< "yes"
     wait
     source shrc
-    wait
     cp ../config/*.cfg $SPEC/config/
   fi
 else
@@ -352,4 +378,3 @@ ls
 echo "All commands issued:"
 grep runspec: *log
 echo "*************************************************************************"
-echo

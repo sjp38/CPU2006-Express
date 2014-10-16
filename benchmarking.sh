@@ -26,19 +26,20 @@ CPU=$(grep 'model name' /proc/cpuinfo | uniq | sed 's/model name\s*:\s//g' | sed
 # if CPU is empty
 if [ -z "$CPU" ]; then
   # this is mainly for ARM systems
+  # example: AArch64 Processor rev 0
   CPU=$(grep 'Processor' /proc/cpuinfo | uniq | sed 's/Processor\s*:\s//g' | sed 's/\s@\s*.*//g' | sed 's/([^)]*)//g' | sed 's/CPU\s*//g')
 fi
 
 # get OS and version
-# example:
-# OS: Ubuntu
-# VER: 14.04
+# example OS: Ubuntu
+# example VER: 14.04
+# TODO: Add fine tuning for OS version
 if [ -f /etc/lsb-release ]; then
   . /etc/lsb-release
   OS=$DISTRIB_ID
   VER=$DISTRIB_RELEASE
 elif [ -f /etc/debian_version ]; then
-  OS='Debian'
+  OS='Debian'  # XXX or Ubuntu??
   VER=$(cat /etc/debian_version)
 elif [ -f /etc/redhat-release ]; then
   OS='Redhat'
@@ -49,14 +50,19 @@ else
 fi
 
 
-# Virtual cores / logical cores
+# virtual cores / logical cores / threads
 LOGICAL_CORES=$(cat /proc/cpuinfo | grep processor | wc -l)
-# Amount of RAM needed to run all copies of SPEC
+
+# amount of RAM needed to run all copies of SPEC
 REQUIRED_RAM=$(expr $LOGICAL_CORES \* 2)
-# Get RAM in KB
+
+# get RAM in KB
 RAM_KB=$(cat /proc/meminfo | grep "MemTotal:      " | sed "s/MemTotal:      //g" | tr -d ' ' | sed "s/kB//g")
-# Convert RAM to GB
+
+# convert RAM to GB
+# 1000 instead of 1024 due to shell math
 RAM_GB=$(expr $RAM_KB / 1000 / 1000)
+
 # if more RAM than required
 if [[ $RAM_GB > $REQUIRED_RAM ]]; then
   COPIES=$LOGICAL_CORES
@@ -64,6 +70,7 @@ else
   COPIES=$(expr $RAM_GB / 2)
 fi
 
+# this does not work for AArch CPUs
 MARCH=$(gcc -march=native -Q --help=target | grep march)
 if [[ $CPU == *'AArch'* ]]; then
   MARCH='armv8-a'
@@ -74,35 +81,35 @@ if [[ $CPU == *'Intel'* ]]; then
   GCC_CONFIG='lnx-x86_64-gcc.cfg'
   if [[ $MARCH == *'corei7-avx2'* ]]; then
     if [ $COPIES -le 0 ]; then
-      INT_COMMAND="runspec --config $GCC_CONFIG --machine corei7-avx2 --rate --reportable int"
-      FP_COMMAND="runspec --config $GCC_CONFIG --machine corei7-avx2 --rate --reportable fp"
+      INT_COMMAND="runspec --config $GCC_CONFIG --machine corei7-avx2 --tune=all --rate --reportable int"
+      FP_COMMAND="runspec --config $GCC_CONFIG --machine corei7-avx2 --tune=all --rate --reportable fp"
     else
-      INT_COMMAND="runspec --config $GCC_CONFIG --machine corei7-avx2 --rate --copies $COPIES --reportable int"
-      FP_COMMAND="runspec --config $GCC_CONFIG --machine corei7-avx2 --rate --copies $COPIES --reportable fp"
+      INT_COMMAND="runspec --config $GCC_CONFIG --machine corei7-avx2 --tune=all --rate --copies $COPIES --reportable int"
+      FP_COMMAND="runspec --config $GCC_CONFIG --machine corei7-avx2 --tune=all --rate --copies $COPIES --reportable fp"
     fi
   elif [[ $MARCH == *'corei7-avx'* ]]; then
     if [ $COPIES -le 0 ]; then
-      INT_COMMAND="runspec --config $GCC_CONFIG --machine corei7-avx --rate --reportable int"
-      FP_COMMAND="runspec --config $GCC_CONFIG --machine corei7-avx --rate --reportable fp"
+      INT_COMMAND="runspec --config $GCC_CONFIG --machine corei7-avx --tune=all --rate --reportable int"
+      FP_COMMAND="runspec --config $GCC_CONFIG --machine corei7-avx --tune=all --rate --reportable fp"
     else
-      INT_COMMAND="runspec --config $GCC_CONFIG --machine corei7-avx --rate --copies $COPIES --reportable int"
-      FP_COMMAND="runspec --config $GCC_CONFIG --machine corei7-avx --rate --copies $COPIES --reportable fp"
+      INT_COMMAND="runspec --config $GCC_CONFIG --machine corei7-avx --tune=all --rate --copies $COPIES --reportable int"
+      FP_COMMAND="runspec --config $GCC_CONFIG --machine corei7-avx --tune=all --rate --copies $COPIES --reportable fp"
     fi
   elif [[ $MARCH == *'corei7'* ]]; then
     if [ $COPIES -le 0 ]; then
-      INT_COMMAND="runspec --config $GCC_CONFIG --machine corei7 --rate --reportable int"
-      FP_COMMAND="runspec --config $GCC_CONFIG --machine corei7 --rate --reportable fp"
+      INT_COMMAND="runspec --config $GCC_CONFIG --machine corei7 --tune=all --rate --reportable int"
+      FP_COMMAND="runspec --config $GCC_CONFIG --machine corei7 --tune=all --rate --reportable fp"
     else
-      INT_COMMAND="runspec --config $GCC_CONFIG --machine corei7 --rate --copies $COPIES --reportable int"
-      FP_COMMAND="runspec --config $GCC_CONFIG --machine corei7 --rate --copies $COPIES --reportable fp"
+      INT_COMMAND="runspec --config $GCC_CONFIG --machine corei7 --tune=all --rate --copies $COPIES --reportable int"
+      FP_COMMAND="runspec --config $GCC_CONFIG --machine corei7 --tune=all --rate --copies $COPIES --reportable fp"
     fi
   else
     if [ $COPIES -le 0 ]; then
-      INT_COMMAND="runspec --config $GCC_CONFIG --machine native --rate --reportable int"
-      FP_COMMAND="runspec --config $GCC_CONFIG --machine native --rate --reportable fp"
+      INT_COMMAND="runspec --config $GCC_CONFIG --machine native --tune=all --rate --reportable int"
+      FP_COMMAND="runspec --config $GCC_CONFIG --machine native --tune=all --rate --reportable fp"
     else
-      INT_COMMAND="runspec --config $GCC_CONFIG --machine native --rate --copies $COPIES --reportable int"
-      FP_COMMAND="runspec --config $GCC_CONFIG --machine native --rate --copies $COPIES --reportable fp"
+      INT_COMMAND="runspec --config $GCC_CONFIG --machine native --tune=all --rate --copies $COPIES --reportable int"
+      FP_COMMAND="runspec --config $GCC_CONFIG --machine native --tune=all --rate --copies $COPIES --reportable fp"
     fi
   fi
 elif [[ $CPU == *'ARM'* ]] || [[ $CPU == *'AArch'* ]]; then
@@ -110,39 +117,39 @@ elif [[ $CPU == *'ARM'* ]] || [[ $CPU == *'AArch'* ]]; then
   GCC_CONFIG='lnx-arm-gcc.cfg'
   if [[ $MARCH == *'a15'* ]] || [[ $MARCH == *'armv7-a'* ]]; then
     if [ $COPIES -le 0 ]; then
-      INT_COMMAND="runspec --config $GCC_CONFIG --machine a15_neon_hard --rate --reportable int"
-      FP_COMMAND="runspec --config $GCC_CONFIG --machine a15_neon_hard --rate --reportable fp"
+      INT_COMMAND="runspec --config $GCC_CONFIG --machine a15_neon_hard --tune=all --rate --reportable int"
+      FP_COMMAND="runspec --config $GCC_CONFIG --machine a15_neon_hard --tune=all --rate --reportable fp"
     else
-      INT_COMMAND="runspec --config $GCC_CONFIG --machine a15_neon_hard --rate --copies $COPIES --reportable int"
-      FP_COMMAND="runspec --config $GCC_CONFIG --machine a15_neon_hard --rate --copies $COPIES --reportable fp"
+      INT_COMMAND="runspec --config $GCC_CONFIG --machine a15_neon_hard --tune=all --rate --copies $COPIES --reportable int"
+      FP_COMMAND="runspec --config $GCC_CONFIG --machine a15_neon_hard --tune=all --rate --copies $COPIES --reportable fp"
     fi
   elif [[ $MARCH == *'armv8-a'* ]]; then
     GCC_CONFIG='lnx-arm64-gcc.cfg'
     if [ $COPIES -le 0 ]; then
-      INT_COMMAND="runspec --config $GCC_CONFIG --machine v8 --rate --reportable int"
-      FP_COMMAND="runspec --config $GCC_CONFIG --machine v8 --rate --reportable fp"
+      INT_COMMAND="runspec --config $GCC_CONFIG --machine v8 --tune=all --rate --reportable int"
+      FP_COMMAND="runspec --config $GCC_CONFIG --machine v8 --tune=all --rate --reportable fp"
     else
-      INT_COMMAND="runspec --config $GCC_CONFIG --machine v8 --rate --copies $COPIES --reportable int"
-      FP_COMMAND="runspec --config $GCC_CONFIG --machine v8 --rate --copies $COPIES --reportable fp"
+      INT_COMMAND="runspec --config $GCC_CONFIG --machine v8 --tune=all --rate --copies $COPIES --reportable int"
+      FP_COMMAND="runspec --config $GCC_CONFIG --machine v8 --tune=all --rate --copies $COPIES --reportable fp"
     fi
   else
     if [ $COPIES -le 0 ]; then
-      INT_COMMAND="runspec --config $GCC_CONFIG --machine generic --rate --reportable int"
-      FP_COMMAND="runspec --config $GCC_CONFIG --machine generic --rate --reportable fp"
+      INT_COMMAND="runspec --config $GCC_CONFIG --machine generic --tune=all --rate --reportable int"
+      FP_COMMAND="runspec --config $GCC_CONFIG --machine generic --tune=all --rate --reportable fp"
     else
-      INT_COMMAND="runspec --config $GCC_CONFIG --machine generic --rate --copies $COPIES --reportable int"
-      FP_COMMAND="runspec --config $GCC_CONFIG --machine generic --rate --copies $COPIES --reportable fp"
+      INT_COMMAND="runspec --config $GCC_CONFIG --machine generic --tune=all --rate --copies $COPIES --reportable int"
+      FP_COMMAND="runspec --config $GCC_CONFIG --machine generic --tune=all --rate --copies $COPIES --reportable fp"
     fi
   fi
 else
   PROCESSOR_OPTION='0'
   GCC_CONFIG='Example-linux64-amd64-gcc43+'
   if [ $COPIES -le 0 ]; then
-    INT_COMMAND="runspec --config $GCC_CONFIG --machine native --rate --reportable int"
-    FP_COMMAND="runspec --config $GCC_CONFIG --machine native --rate --reportable fp"
+    INT_COMMAND="runspec --config $GCC_CONFIG --machine native --tune=all --rate --reportable int"
+    FP_COMMAND="runspec --config $GCC_CONFIG --machine native --tune=all --rate --reportable fp"
   else
-    INT_COMMAND="runspec --config $GCC_CONFIG --machine native --rate --copies $COPIES --reportable int"
-    FP_COMMAND="runspec --config $GCC_CONFIG --machine native --rate --copies $COPIES--reportable fp"
+    INT_COMMAND="runspec --config $GCC_CONFIG --machine native --tune=all --rate --copies $COPIES --reportable int"
+    FP_COMMAND="runspec --config $GCC_CONFIG --machine native --tune=all --rate --copies $COPIES--reportable fp"
   fi
 fi
 
@@ -162,7 +169,7 @@ echo "GCC FP command:     $FP_COMMAND"
 echo 
 echo "******************************* Warnings ********************************"
 if [[ $RAM_GB -ge $REQUIRED_RAM ]]; then
-  echo "None"
+  echo "                                  None"
 else
   echo "The number of copies has been changed from $LOGICAL_CORES to $COPIES because there isn't"
   echo "enough RAM to support the number of CPUs on this machine. Please add more"
@@ -189,66 +196,63 @@ if [ ! -d "SPECCPU" ]; then
 
   # if apt-get is installed
   if hash apt-get; then
-    sudo -E apt-get update -y
-    sudo -E apt-get upgrade -y
-    sudo -E apt-get install build-essential -y
-    sudo -E apt-get install numactl -y
+    sudo -E apt-get update -y -qq
+    sudo -E apt-get upgrade -y -qq
+    sudo -E apt-get install build-essential -y -qq
+    sudo -E apt-get install numactl -y -qq
     # double check
-    sudo -E apt-get install gcc -y
-    sudo -E apt-get install g++ -y
-    sudo -E apt-get install gfortran -y
-    sudo -E apt-get install automake -y
+    sudo -E apt-get install gcc -y -qq
+    sudo -E apt-get install g++ -y -qq
+    sudo -E apt-get install gfortran -y -qq
+    sudo -E apt-get install automake -y -qq
     # arm
     if [ '$PROCESSOR_OPTION' == '3' ]; then
-      sudo -E apt-get install gcc-4.8-arm-linux-gnueabi -y
+      sudo -E apt-get install gcc-4.8-arm-linux-gnueabi -y -qq
       if [[ $MARCH == *'armv8-a'* ]]; then
-        sudo -E apt-get build-dep crossbuild-essential-arm64 -y
-        sudo -E apt-get build-dep gcc-4.8-arm-linux-gnueabihf-base -y
-        sudo -E apt-get build-dep binutils-aarch64-linux-gnu -y
+        sudo -E apt-get build-dep crossbuild-essential-arm64 -y -qq
+        sudo -E apt-get build-dep gcc-4.8-arm-linux-gnueabihf-base -y -qq
+        sudo -E apt-get build-dep binutils-aarch64-linux-gnu -y -qq
         # update to 4.9
-        sudo -E add-apt-repository ppa:ubuntu-toolchain-r/test -y
-        sudo -E apt-get update -y
-        sudo -E apt-get install gcc-4.9 -y
-        sudo -E apt-get install g++-4.9 -y
-        sudo -E apt-get install gfortran-4.9 -y
+        sudo -E add-apt-repository ppa:ubuntu-toolchain-r/test -y -qq
+        sudo -E apt-get update -y -qq
+        sudo -E apt-get install gcc-4.9 -y -qq
+        sudo -E apt-get install g++-4.9 -y -qq
+        sudo -E apt-get install gfortran-4.9 -y -qq
         # Remove the previous gcc version from the default applications list (if already exists)
-        sudo update-alternatives --remove-all gcc
-        sudo update-alternatives --remove-all g++
-        sudo update-alternatives --remove-all gfortran
+        sudo update-alternatives --remove-all gcc --quiet
+        sudo update-alternatives --remove-all g++ --quiet
+        sudo update-alternatives --remove-all gfortran --quiet
         # Make GCC 4.9 the default compiler on the system
-        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.9 20
-        sudo update-alternatives --config gcc
-        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.9 20
-        sudo update-alternatives --config g++
-        sudo update-alternatives --install /usr/bin/gfortran gfortran /usr/bin/gfortran-4.9 20
-        sudo update-alternatives --config gfortran
+        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.9 20 --quiet
+        sudo update-alternatives --config gcc --quiet
+        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.9 20 --quiet
+        sudo update-alternatives --config g++ --quiet
+        sudo update-alternatives --install /usr/bin/gfortran gfortran /usr/bin/gfortran-4.9 20 --quiet
+        sudo update-alternatives --config gfortran --quiet
       fi
     fi
-    wait
   else
-    sudo -E yum check-update -y
-    sudo -E yum update -y
-    sudo -E yum install gcc -y
-    sudo -E yum install g++ -y
-    sudo -E yum install gfortran -y
-    sudo -E yum install numactl -y
-    sudo -E yum install automake -y
+    sudo -E yum check-update -y --quiet
+    sudo -E yum update -y --quiet
+    sudo -E yum install gcc -y --quiet
+    sudo -E yum install g++ -y --quiet
+    sudo -E yum install gfortran -y --quiet
+    sudo -E yum install numactl -y --quiet
+    sudo -E yum install automake -y --quiet
     if [ '$PROCESSOR_OPTION' == '3' ]; then
-      sudo -E yum install gcc-4.8-arm-linux-gnueabi
+      sudo -E yum install gcc-4.8-arm-linux-gnueabi -y --quiet
       if [[ $MARCH == *'armv8-a'* ]]; then
-        sudo -E yum-builddep gcc-4.8-arm-linux-gnueabihf-base
-        sudo -E yum-builddep binutils-aarch64-linux-gnu
+        sudo -E yum-builddep gcc-4.8-arm-linux-gnueabihf-base -y --quiet
+        sudo -E yum-builddep binutils-aarch64-linux-gnu -y --quiet
       fi
     fi
   fi
   # if SPECCPU is not extracted
   echo "Extracting SPECCPU..."
   tar xf SPECCPU.tar
-  wait
   cd SPECCPU
   echo "Extracting cpu2006..."
   tar xf cpu2006-1.2.tar.xz
-  wait
   if [ "$PROCESSOR_OPTION" == "3" ]; then
     # for ARM
     echo "Building for ARM..."
@@ -284,7 +288,6 @@ EOL
       printf 'Updating config.guess file: %s\n' "$guess_file"
       cp ../../../arm/config.guess $guess_file
     done < <(find . -iname 'config.guess' -print0)
-    wait
 
     # update the config.sub files
     chmod 775 ../../../arm/config.sub
@@ -292,7 +295,6 @@ EOL
       printf 'Updating config.sub file: %s\n' "$sub_file"
       cp ../../../arm/config.sub $sub_file
     done < <(find . -iname 'config.sub' -print0)
-    wait
 
     # fix errors
     find . -type f -exec grep -H '_GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");' {} + | awk '{print $1;}' | sed 's/:_GL_WARN_ON_USE//g' | while read -r gl_warn_file; do 
@@ -302,14 +304,14 @@ EOL
 
     # build
     ./setup.sh
-    wait
     cd ../..
     source shrc
     cp ../config/*.cfg $SPEC/config/
   else
     ./install.sh <<< "yes"
-    wait
     source shrc
+    echo "Extracting ICC files..."
+    tar xf 'cpu2006.1.2.ic14.0.linux64.for.intel.16jan2014.tar.xz'
     cp ../config/*.cfg $SPEC/config/
   fi
 else
@@ -317,8 +319,6 @@ else
   cd SPECCPU
   source shrc
 fi
-
-wait
 
 echo "*************************************************************************"
 
@@ -332,15 +332,12 @@ else
   source shrc
 fi
 
-# GCC
-
 $INT_COMMAND
-wait
 
 if (( $? == 0 )); then
   GCC_FULL_INT_FILE=$(ls -t $SPEC/result/*.html | head -1)
   GCC_FULL_INT_OUT=$(cat $GCC_FULL_INT_FILE | grep -o -P '(?<=base:).*(?=\")')
-  echo "Results are base: $GCC_FULL_INT_OUT"
+  echo "Results are: base: $GCC_FULL_INT_OUT"
 else
   GCC_FULL_INT_LOG=$(ls -t $SPEC/result/*.log | head -1)
   echo "There was an error and no results were made. Please check the log file for more info: $GCC_FULL_INT_LOG"
@@ -351,18 +348,16 @@ echo "Running all the benchmarks in fp with reportable..."
 echo "*************************************************************************"
 
 $FP_COMMAND
-wait
 
 if (( $? == 0 )); then
   GCC_FULL_FP_FILE=$(ls -t $SPEC/result/*.html | head -1)
   GCC_FULL_FP_OUT=$(cat $GCC_FULL_FP_FILE | grep -o -P '(?<=base:).*(?=\")')
-  echo "Results are base: $GCC_FULL_FP_OUT"
+  echo "Results are: base: $GCC_FULL_FP_OUT"
 else
   GCC_FULL_FP_LOG=$(ls -t $SPEC/result/*.log | head -1)
   echo "There was an error and no results were made. Please check the log file for more info: $GCC_FULL_FP_LOG"
 fi
 
-wait
 echo "*************************************************************************"
 # display results directory and files within, in addition to the commands used.
 cd $SPEC/result

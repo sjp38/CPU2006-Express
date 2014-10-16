@@ -1,4 +1,6 @@
 #!/bin/bash
+#
+# Perform SPEC CPU2006 benchmarking.
 
 # detect os architecture, os distribution, and os version
 # displays bits, either 64 or 32
@@ -333,7 +335,7 @@ fi
 
 # GCC
 
-eval $INT_COMMAND
+$INT_COMMAND
 wait
 
 # try/catch
@@ -352,7 +354,7 @@ echo "Running all the benchmarks in fp with reportable..."
 
 echo "*************************************************************************"
 
-eval $FP_COMMAND
+$FP_COMMAND
 wait
 
 # try/catch

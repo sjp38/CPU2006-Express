@@ -310,8 +310,8 @@ EOL
   else
     ./install.sh <<< "yes"
     source shrc
-    echo "Extracting ICC files..."
-    tar xf 'cpu2006.1.2.ic14.0.linux64.for.intel.16jan2014.tar.xz'
+    # add extract custom binaries here
+    # tar xf custom_binaries.tar.gz
     cp ../config/*.cfg $SPEC/config/
   fi
 else

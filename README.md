@@ -28,10 +28,8 @@ The assumed file structure is as follows:
 │   ├── config.guess
 │   └── README.md
 ├── config/
-│   ├── linux64-armv7-gcc.cfg
-│   ├── linux64-c2750-gcc.cfg
-│   ├── linux64-e5_1650-gcc.cfg
 │   ├── lnx-arm-gcc.cfg
+│   ├── lnx-arm64-gcc.cfg
 │   ├── lnx-i686-gcc.cfg
 │   └── lnx-x86_64-gcc.cfg
 ├── SPECCPU.tar

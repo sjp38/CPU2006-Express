@@ -38,7 +38,7 @@ if [ -f /etc/lsb-release ]; then
   OS=$DISTRIB_ID
   VER=$DISTRIB_RELEASE
 elif [ -f /etc/debian_version ]; then
-  OS='Debian'  # XXX or Ubuntu??
+  OS='Debian'
   VER=$(cat /etc/debian_version)
 elif [ -f /etc/redhat-release ]; then
   OS='Redhat'
@@ -74,35 +74,35 @@ if [[ $CPU == *'Intel'* ]]; then
   GCC_CONFIG='lnx-x86_64-gcc.cfg'
   if [[ $MARCH == *'corei7-avx2'* ]]; then
     if [ $COPIES -le 0 ]; then
-      INT_COMMAND='runspec --config '$GCC_CONFIG' --machine corei7-avx2 --rate --reportable int'
-      FP_COMMAND='runspec --config '$GCC_CONFIG' --machine corei7-avx2 --rate --reportable fp'
+      INT_COMMAND="runspec --config $GCC_CONFIG --machine corei7-avx2 --rate --reportable int"
+      FP_COMMAND="runspec --config $GCC_CONFIG --machine corei7-avx2 --rate --reportable fp"
     else
-      INT_COMMAND='runspec --config '$GCC_CONFIG' --machine corei7-avx2 --rate --copies '$COPIES' --reportable int'
-      FP_COMMAND='runspec --config '$GCC_CONFIG' --machine corei7-avx2 --rate --copies '$COPIES' --reportable fp'
+      INT_COMMAND="runspec --config $GCC_CONFIG --machine corei7-avx2 --rate --copies $COPIES --reportable int"
+      FP_COMMAND="runspec --config $GCC_CONFIG --machine corei7-avx2 --rate --copies $COPIES --reportable fp"
     fi
   elif [[ $MARCH == *'corei7-avx'* ]]; then
     if [ $COPIES -le 0 ]; then
-      INT_COMMAND='runspec --config '$GCC_CONFIG' --machine corei7-avx --rate --reportable int'
-      FP_COMMAND='runspec --config '$GCC_CONFIG' --machine corei7-avx --rate --reportable fp'
+      INT_COMMAND="runspec --config $GCC_CONFIG --machine corei7-avx --rate --reportable int"
+      FP_COMMAND="runspec --config $GCC_CONFIG --machine corei7-avx --rate --reportable fp"
     else
-      INT_COMMAND='runspec --config '$GCC_CONFIG' --machine corei7-avx --rate --copies '$COPIES' --reportable int'
-      FP_COMMAND='runspec --config '$GCC_CONFIG' --machine corei7-avx --rate --copies '$COPIES' --reportable fp'
+      INT_COMMAND="runspec --config $GCC_CONFIG --machine corei7-avx --rate --copies $COPIES --reportable int"
+      FP_COMMAND="runspec --config $GCC_CONFIG --machine corei7-avx --rate --copies $COPIES --reportable fp"
     fi
   elif [[ $MARCH == *'corei7'* ]]; then
     if [ $COPIES -le 0 ]; then
-      INT_COMMAND='runspec --config '$GCC_CONFIG' --machine corei7 --rate --reportable int'
-      FP_COMMAND='runspec --config '$GCC_CONFIG' --machine corei7 --rate --reportable fp'
+      INT_COMMAND="runspec --config $GCC_CONFIG --machine corei7 --rate --reportable int"
+      FP_COMMAND="runspec --config $GCC_CONFIG --machine corei7 --rate --reportable fp"
     else
-      INT_COMMAND='runspec --config '$GCC_CONFIG' --machine corei7 --rate --copies '$COPIES' --reportable int'
-      FP_COMMAND='runspec --config '$GCC_CONFIG' --machine corei7 --rate --copies '$COPIES' --reportable fp'
+      INT_COMMAND="runspec --config $GCC_CONFIG --machine corei7 --rate --copies $COPIES --reportable int"
+      FP_COMMAND="runspec --config $GCC_CONFIG --machine corei7 --rate --copies $COPIES --reportable fp"
     fi
   else
     if [ $COPIES -le 0 ]; then
-      INT_COMMAND='runspec --config '$GCC_CONFIG' --machine native --rate --reportable int'
-      FP_COMMAND='runspec --config '$GCC_CONFIG' --machine native --rate --reportable fp'
+      INT_COMMAND="runspec --config $GCC_CONFIG --machine native --rate --reportable int"
+      FP_COMMAND="runspec --config $GCC_CONFIG --machine native --rate --reportable fp"
     else
-      INT_COMMAND='runspec --config '$GCC_CONFIG' --machine native --rate --copies '$COPIES' --reportable int'
-      FP_COMMAND='runspec --config '$GCC_CONFIG' --machine native --rate --copies '$COPIES' --reportable fp'
+      INT_COMMAND="runspec --config $GCC_CONFIG --machine native --rate --copies $COPIES --reportable int"
+      FP_COMMAND="runspec --config $GCC_CONFIG --machine native --rate --copies $COPIES --reportable fp"
     fi
   fi
 elif [[ $CPU == *'ARM'* ]] || [[ $CPU == *'AArch'* ]]; then
@@ -110,39 +110,39 @@ elif [[ $CPU == *'ARM'* ]] || [[ $CPU == *'AArch'* ]]; then
   GCC_CONFIG='lnx-arm-gcc.cfg'
   if [[ $MARCH == *'a15'* ]] || [[ $MARCH == *'armv7-a'* ]]; then
     if [ $COPIES -le 0 ]; then
-      INT_COMMAND='runspec --config '$GCC_CONFIG' --machine a15_neon_hard --rate --reportable int'
-      FP_COMMAND='runspec --config '$GCC_CONFIG' --machine a15_neon_hard --rate --reportable fp'
+      INT_COMMAND="runspec --config $GCC_CONFIG --machine a15_neon_hard --rate --reportable int"
+      FP_COMMAND="runspec --config $GCC_CONFIG --machine a15_neon_hard --rate --reportable fp"
     else
-      INT_COMMAND='runspec --config '$GCC_CONFIG' --machine a15_neon_hard --rate --copies '$COPIES' --reportable int'
-      FP_COMMAND='runspec --config '$GCC_CONFIG' --machine a15_neon_hard --rate --copies '$COPIES' --reportable fp'
+      INT_COMMAND="runspec --config $GCC_CONFIG --machine a15_neon_hard --rate --copies $COPIES --reportable int"
+      FP_COMMAND="runspec --config $GCC_CONFIG --machine a15_neon_hard --rate --copies $COPIES --reportable fp"
     fi
   elif [[ $MARCH == *'armv8-a'* ]]; then
     GCC_CONFIG='lnx-arm64-gcc.cfg'
     if [ $COPIES -le 0 ]; then
-      INT_COMMAND='runspec --config '$GCC_CONFIG' --machine v8 --rate --reportable int'
-      FP_COMMAND='runspec --config '$GCC_CONFIG' --machine v8 --rate --reportable fp'
+      INT_COMMAND="runspec --config $GCC_CONFIG --machine v8 --rate --reportable int"
+      FP_COMMAND="runspec --config $GCC_CONFIG --machine v8 --rate --reportable fp"
     else
-      INT_COMMAND='runspec --config '$GCC_CONFIG' --machine v8 --rate --copies '$COPIES' --reportable int'
-      FP_COMMAND='runspec --config '$GCC_CONFIG' --machine v8 --rate --copies '$COPIES' --reportable fp'
+      INT_COMMAND="runspec --config $GCC_CONFIG --machine v8 --rate --copies $COPIES --reportable int"
+      FP_COMMAND="runspec --config $GCC_CONFIG --machine v8 --rate --copies $COPIES --reportable fp"
     fi
   else
     if [ $COPIES -le 0 ]; then
-      INT_COMMAND='runspec --config '$GCC_CONFIG' --machine generic --rate --reportable int'
-      FP_COMMAND='runspec --config '$GCC_CONFIG' --machine generic --rate --reportable fp'
+      INT_COMMAND="runspec --config $GCC_CONFIG --machine generic --rate --reportable int"
+      FP_COMMAND="runspec --config $GCC_CONFIG --machine generic --rate --reportable fp"
     else
-      INT_COMMAND='runspec --config '$GCC_CONFIG' --machine generic --rate --copies '$COPIES' --reportable int'
-      FP_COMMAND='runspec --config '$GCC_CONFIG' --machine generic --rate --copies '$COPIES' --reportable fp'
+      INT_COMMAND="runspec --config $GCC_CONFIG --machine generic --rate --copies $COPIES --reportable int"
+      FP_COMMAND="runspec --config $GCC_CONFIG --machine generic --rate --copies $COPIES --reportable fp"
     fi
   fi
 else
   PROCESSOR_OPTION='0'
   GCC_CONFIG='Example-linux64-amd64-gcc43+'
   if [ $COPIES -le 0 ]; then
-    INT_COMMAND='runspec --config '$GCC_CONFIG' --machine native --rate --reportable int'
-    FP_COMMAND='runspec --config '$GCC_CONFIG' --machine native --rate --reportable fp'
+    INT_COMMAND="runspec --config $GCC_CONFIG --machine native --rate --reportable int"
+    FP_COMMAND="runspec --config $GCC_CONFIG --machine native --rate --reportable fp"
   else
-    INT_COMMAND='runspec --config '$GCC_CONFIG' --machine native --rate --copies '$COPIES' --reportable int'
-    FP_COMMAND='runspec --config '$GCC_CONFIG' --machine native --rate --copies '$COPIES'--reportable fp'
+    INT_COMMAND="runspec --config $GCC_CONFIG --machine native --rate --copies $COPIES --reportable int"
+    FP_COMMAND="runspec --config $GCC_CONFIG --machine native --rate --copies $COPIES--reportable fp"
   fi
 fi
 
@@ -184,8 +184,8 @@ echo "Checking if CPU2006 needs to be installed and installing if necessary..."
 if [ ! -d "SPECCPU" ]; then
   # install prereqs
   echo "Checking if prerequisites need to be installed and installing if necessary..."
-  #export http_proxy=http://proxy-us.test.com:911
-  #export https_proxy=http://proxy-us.test.com:911
+  #export http_proxy=http://proxy-us.ryanspoone.com:911
+  #export https_proxy=http://proxy-us.ryanspoone.com:911
 
   # if apt-get is installed
   if hash apt-get; then
@@ -205,7 +205,6 @@ if [ ! -d "SPECCPU" ]; then
         sudo -E apt-get build-dep crossbuild-essential-arm64 -y
         sudo -E apt-get build-dep gcc-4.8-arm-linux-gnueabihf-base -y
         sudo -E apt-get build-dep binutils-aarch64-linux-gnu -y
-
         # update to 4.9
         sudo -E add-apt-repository ppa:ubuntu-toolchain-r/test -y
         sudo -E apt-get update -y
@@ -338,16 +337,13 @@ fi
 $INT_COMMAND
 wait
 
-# try/catch
-GCC_FULL_INT_FILE=$(ls -t $SPEC/result/*.html | head -1)
-GCC_FULL_INT_OUT=$(cat $GCC_FULL_INT_FILE | grep -o -P '(?<=base:).*(?=\")')
-$GCC_FULL_INT_OUT 2>/dev/null
-
 if (( $? == 0 )); then
-    echo "RESULTS: base:"$GCC_FULL_INT_OUT
+  GCC_FULL_INT_FILE=$(ls -t $SPEC/result/*.html | head -1)
+  GCC_FULL_INT_OUT=$(cat $GCC_FULL_INT_FILE | grep -o -P '(?<=base:).*(?=\")')
+  echo "Results are base: $GCC_FULL_INT_OUT"
 else
-    GCC_FULL_INT_LOG=$(ls -t $SPEC/result/*.log | head -1)
-    echo "There was an error and no results were made. Please check the log file for more info: "$GCC_FULL_INT_LOG
+  GCC_FULL_INT_LOG=$(ls -t $SPEC/result/*.log | head -1)
+  echo "There was an error and no results were made. Please check the log file for more info: $GCC_FULL_INT_LOG"
 fi 
 
 echo "Running all the benchmarks in fp with reportable..."
@@ -357,16 +353,13 @@ echo "*************************************************************************"
 $FP_COMMAND
 wait
 
-# try/catch
-GCC_FULL_FP_FILE=$(ls -t $SPEC/result/*.html | head -1)
-GCC_FULL_FP_OUT=$(cat $GCC_FULL_FP_FILE | grep -o -P '(?<=base:).*(?=\")')
-$GCC_FULL_FP_OUT 2>/dev/null
-
 if (( $? == 0 )); then
-    echo "RESULTS: base:"$GCC_FULL_FP_OUT
+  GCC_FULL_FP_FILE=$(ls -t $SPEC/result/*.html | head -1)
+  GCC_FULL_FP_OUT=$(cat $GCC_FULL_FP_FILE | grep -o -P '(?<=base:).*(?=\")')
+  echo "Results are base: $GCC_FULL_FP_OUT"
 else
-    GCC_FULL_FP_LOG=$(ls -t $SPEC/result/*.log | head -1)
-    echo "There was an error and no results were made. Please check the log file for more info: "$GCC_FULL_FP_LOG
+  GCC_FULL_FP_LOG=$(ls -t $SPEC/result/*.log | head -1)
+  echo "There was an error and no results were made. Please check the log file for more info: $GCC_FULL_FP_LOG"
 fi
 
 wait

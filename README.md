@@ -1,7 +1,32 @@
 Building and running SPEC CPU2006 on Linux
 ==========================================
 
-This script is to automate building and running SPEC CPU2006 on Linux with either an Intel or ARM processor using gcc, g++, and gfortran.
+This script is to automate building and running SPEC CPU2006 on Linux with either an Intel or ARM processor using gcc, g++, and gfortran. Supported CPU architectures are as follows:
+
+*32 bit*
+
++ ARM Cortex-A9
++ ARM Cortex-A15
++ ARM Marvell
++ ARM Generic
++ Intel Atom
++ Intel SLM
++ Intel Core 2
++ Intel Core i7
++ Intel Core i7 AVX
++ Intel Core i7 AVX2
+
+*64 bit*
+
++ ARM Cortex-A53
++ ARM Cortex-A57
++ ARM Generic
++ Intel Atom
++ Intel SLM
++ Intel Core 2
++ Intel Core i7
++ Intel Core i7 AVX
++ Intel Core i7 AVX2
 
 
 **NOTE: You must provide the archive `SPECCPU.tar` which contains `cpu2006-1.2.tar.xz`. I do not provide this.**

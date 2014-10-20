@@ -70,67 +70,234 @@ else
   COPIES=$(expr $RAM_GB / 2)
 fi
 
-# this does not work for AArch CPUs
-MARCH=$(gcc -march=native -Q --help=target | grep march)
+# the name of the target architecture
+MARCH=$(gcc -march=native -Q --help=target 2>> /dev/null | grep march)
+
 if [[ $CPU == *'AArch'* ]]; then
   MARCH='armv8-a'
 fi
 
+# name of the target processor
+MCPU=$(gcc -mcpu=native -Q --help=target 2>> /dev/null | grep mcpu)
+
+# for ARM64
+if [[ $MCPU == *'CPU'* ]] && [[ $CPU == *'AArch'* ]]; then
+  MCPU='generic'
+fi
+
+# floating-point ABI to use
+FPABI=$(gcc -march=native -Q --help=target 2>> /dev/null | grep mfloat-abi)
+
+# generating code that executes Thumb state
+MTHUMB=$(gcc -march=native -Q --help=target 2>> /dev/null | grep "\-mthumb ")
+
+echo $MARCH
+echo $MCPU
+echo $FPABI
+echo $MTHUMB
+
+# Intel Processors
 if [[ $CPU == *'Intel'* ]]; then
-  PROCESSOR_OPTION='1'
-  GCC_CONFIG='lnx-x86_64-gcc.cfg'
-  if [[ $MARCH == *'corei7-avx2'* ]]; then
-    if [ $COPIES -le 0 ]; then
-      INT_COMMAND="runspec --config $GCC_CONFIG --machine corei7-avx2 --tune=all --rate --reportable int"
-      FP_COMMAND="runspec --config $GCC_CONFIG --machine corei7-avx2 --tune=all --rate --reportable fp"
+  GCC_CONFIG='lnx-x86_64-gcc'
+
+  # 32 bit
+  if [[ $ARCH == *'32'* ]]; then
+    if [[ $MARCH == *'corei7-avx2'* ]]; then
+      if [ $COPIES -le 0 ]; then
+        INT_COMMAND="runspec --config $GCC_CONFIG --machine corei7-avx2 --tune=all --rate --reportable int"
+        FP_COMMAND="runspec --config $GCC_CONFIG --machine corei7-avx2 --tune=all --rate --reportable fp"
+      else
+        INT_COMMAND="runspec --config $GCC_CONFIG --machine corei7-avx2 --tune=all --rate --copies $COPIES --reportable int"
+        FP_COMMAND="runspec --config $GCC_CONFIG --machine corei7-avx2 --tune=all --rate --copies $COPIES --reportable fp"
+      fi
+    elif [[ $MARCH == *'corei7-avx'* ]]; then
+      if [ $COPIES -le 0 ]; then
+        INT_COMMAND="runspec --config $GCC_CONFIG --machine corei7-avx --tune=all --rate --reportable int"
+        FP_COMMAND="runspec --config $GCC_CONFIG --machine corei7-avx --tune=all --rate --reportable fp"
+      else
+        INT_COMMAND="runspec --config $GCC_CONFIG --machine corei7-avx --tune=all --rate --copies $COPIES --reportable int"
+        FP_COMMAND="runspec --config $GCC_CONFIG --machine corei7-avx --tune=all --rate --copies $COPIES --reportable fp"
+      fi
+    elif [[ $MARCH == *'corei7'* ]]; then
+      if [ $COPIES -le 0 ]; then
+        INT_COMMAND="runspec --config $GCC_CONFIG --machine corei7 --tune=all --rate --reportable int"
+        FP_COMMAND="runspec --config $GCC_CONFIG --machine corei7 --tune=all --rate --reportable fp"
+      else
+        INT_COMMAND="runspec --config $GCC_CONFIG --machine corei7 --tune=all --rate --copies $COPIES --reportable int"
+        FP_COMMAND="runspec --config $GCC_CONFIG --machine corei7 --tune=all --rate --copies $COPIES --reportable fp"
+      fi
+    elif [[ $MARCH == *'atom'* ]]; then
+      if [ $COPIES -le 0 ]; then
+        INT_COMMAND="runspec --config $GCC_CONFIG --machine atom --tune=all --rate --reportable int"
+        FP_COMMAND="runspec --config $GCC_CONFIG --machine atom --tune=all --rate --reportable fp"
+      else
+        INT_COMMAND="runspec --config $GCC_CONFIG --machine atom --tune=all --rate --copies $COPIES --reportable int"
+        FP_COMMAND="runspec --config $GCC_CONFIG --machine atom --tune=all --rate --copies $COPIES --reportable fp"
+      fi
+    elif [[ $MARCH == *'slm'* ]]; then
+      if [ $COPIES -le 0 ]; then
+        INT_COMMAND="runspec --config $GCC_CONFIG --machine slm --tune=all --rate --reportable int"
+        FP_COMMAND="runspec --config $GCC_CONFIG --machine slm --tune=all --rate --reportable fp"
+      else
+        INT_COMMAND="runspec --config $GCC_CONFIG --machine slm --tune=all --rate --copies $COPIES --reportable int"
+        FP_COMMAND="runspec --config $GCC_CONFIG --machine slm --tune=all --rate --copies $COPIES --reportable fp"
+      fi
+    elif [[ $MARCH == *'core2'* ]]; then
+      if [ $COPIES -le 0 ]; then
+        INT_COMMAND="runspec --config $GCC_CONFIG --machine core2 --tune=all --rate --reportable int"
+        FP_COMMAND="runspec --config $GCC_CONFIG --machine core2 --tune=all --rate --reportable fp"
+      else
+        INT_COMMAND="runspec --config $GCC_CONFIG --machine core2 --tune=all --rate --copies $COPIES --reportable int"
+        FP_COMMAND="runspec --config $GCC_CONFIG --machine core2 --tune=all --rate --copies $COPIES --reportable fp"
+      fi
     else
-      INT_COMMAND="runspec --config $GCC_CONFIG --machine corei7-avx2 --tune=all --rate --copies $COPIES --reportable int"
-      FP_COMMAND="runspec --config $GCC_CONFIG --machine corei7-avx2 --tune=all --rate --copies $COPIES --reportable fp"
+      if [ $COPIES -le 0 ]; then
+        INT_COMMAND="runspec --config $GCC_CONFIG --machine native --tune=all --rate --reportable int"
+        FP_COMMAND="runspec --config $GCC_CONFIG --machine native --tune=all --rate --reportable fp"
+      else
+        INT_COMMAND="runspec --config $GCC_CONFIG --machine native --tune=all --rate --copies $COPIES --reportable int"
+        FP_COMMAND="runspec --config $GCC_CONFIG --machine native --tune=all --rate --copies $COPIES --reportable fp"
+      fi
     fi
-  elif [[ $MARCH == *'corei7-avx'* ]]; then
-    if [ $COPIES -le 0 ]; then
-      INT_COMMAND="runspec --config $GCC_CONFIG --machine corei7-avx --tune=all --rate --reportable int"
-      FP_COMMAND="runspec --config $GCC_CONFIG --machine corei7-avx --tune=all --rate --reportable fp"
-    else
-      INT_COMMAND="runspec --config $GCC_CONFIG --machine corei7-avx --tune=all --rate --copies $COPIES --reportable int"
-      FP_COMMAND="runspec --config $GCC_CONFIG --machine corei7-avx --tune=all --rate --copies $COPIES --reportable fp"
-    fi
-  elif [[ $MARCH == *'corei7'* ]]; then
-    if [ $COPIES -le 0 ]; then
-      INT_COMMAND="runspec --config $GCC_CONFIG --machine corei7 --tune=all --rate --reportable int"
-      FP_COMMAND="runspec --config $GCC_CONFIG --machine corei7 --tune=all --rate --reportable fp"
-    else
-      INT_COMMAND="runspec --config $GCC_CONFIG --machine corei7 --tune=all --rate --copies $COPIES --reportable int"
-      FP_COMMAND="runspec --config $GCC_CONFIG --machine corei7 --tune=all --rate --copies $COPIES --reportable fp"
-    fi
+  # 64 bit
   else
-    if [ $COPIES -le 0 ]; then
-      INT_COMMAND="runspec --config $GCC_CONFIG --machine native --tune=all --rate --reportable int"
-      FP_COMMAND="runspec --config $GCC_CONFIG --machine native --tune=all --rate --reportable fp"
+    if [[ $MARCH == *'corei7-avx2'* ]]; then
+      if [ $COPIES -le 0 ]; then
+        INT_COMMAND="runspec --config $GCC_CONFIG --machine corei7-avx2 --tune=all --rate --reportable int"
+        FP_COMMAND="runspec --config $GCC_CONFIG --machine corei7-avx2 --tune=all --rate --reportable fp"
+      else
+        INT_COMMAND="runspec --config $GCC_CONFIG --machine corei7-avx2 --tune=all --rate --copies $COPIES --reportable int"
+        FP_COMMAND="runspec --config $GCC_CONFIG --machine corei7-avx2 --tune=all --rate --copies $COPIES --reportable fp"
+      fi
+    elif [[ $MARCH == *'corei7-avx'* ]]; then
+      if [ $COPIES -le 0 ]; then
+        INT_COMMAND="runspec --config $GCC_CONFIG --machine corei7-avx --tune=all --rate --reportable int"
+        FP_COMMAND="runspec --config $GCC_CONFIG --machine corei7-avx --tune=all --rate --reportable fp"
+      else
+        INT_COMMAND="runspec --config $GCC_CONFIG --machine corei7-avx --tune=all --rate --copies $COPIES --reportable int"
+        FP_COMMAND="runspec --config $GCC_CONFIG --machine corei7-avx --tune=all --rate --copies $COPIES --reportable fp"
+      fi
+    elif [[ $MARCH == *'corei7'* ]]; then
+      if [ $COPIES -le 0 ]; then
+        INT_COMMAND="runspec --config $GCC_CONFIG --machine corei7 --tune=all --rate --reportable int"
+        FP_COMMAND="runspec --config $GCC_CONFIG --machine corei7 --tune=all --rate --reportable fp"
+      else
+        INT_COMMAND="runspec --config $GCC_CONFIG --machine corei7 --tune=all --rate --copies $COPIES --reportable int"
+        FP_COMMAND="runspec --config $GCC_CONFIG --machine corei7 --tune=all --rate --copies $COPIES --reportable fp"
+      fi
     else
-      INT_COMMAND="runspec --config $GCC_CONFIG --machine native --tune=all --rate --copies $COPIES --reportable int"
-      FP_COMMAND="runspec --config $GCC_CONFIG --machine native --tune=all --rate --copies $COPIES --reportable fp"
+      if [ $COPIES -le 0 ]; then
+        INT_COMMAND="runspec --config $GCC_CONFIG --machine native --tune=all --rate --reportable int"
+        FP_COMMAND="runspec --config $GCC_CONFIG --machine native --tune=all --rate --reportable fp"
+      else
+        INT_COMMAND="runspec --config $GCC_CONFIG --machine native --tune=all --rate --copies $COPIES --reportable int"
+        FP_COMMAND="runspec --config $GCC_CONFIG --machine native --tune=all --rate --copies $COPIES --reportable fp"
+      fi
     fi
   fi
+# ARM processors
 elif [[ $CPU == *'ARM'* ]] || [[ $CPU == *'AArch'* ]]; then
-  PROCESSOR_OPTION='3'
-  GCC_CONFIG='lnx-arm-gcc.cfg'
-  if [[ $MARCH == *'a15'* ]] || [[ $MARCH == *'armv7-a'* ]]; then
-    if [ $COPIES -le 0 ]; then
-      INT_COMMAND="runspec --config $GCC_CONFIG --machine a15_neon_hard --tune=all --rate --reportable int"
-      FP_COMMAND="runspec --config $GCC_CONFIG --machine a15_neon_hard --tune=all --rate --reportable fp"
+  GCC_CONFIG='lnx-arm-gcc'
+  if [[ $MARCH == *'armv7-a'* ]]; then
+    if [[ $MCPU == *'a15'* ]]; then
+      if [[ $FPABI == *'hard'* ]]; then
+        if [ $COPIES -le 0 ]; then
+          INT_COMMAND="runspec --config $GCC_CONFIG --machine a15_neon_hard --tune=all --rate --reportable int"
+          FP_COMMAND="runspec --config $GCC_CONFIG --machine a15_neon_hard --tune=all --rate --reportable fp"
+        else
+          INT_COMMAND="runspec --config $GCC_CONFIG --machine a15_neon_hard --tune=all --rate --copies $COPIES --reportable int"
+          FP_COMMAND="runspec --config $GCC_CONFIG --machine a15_neon_hard --tune=all --rate --copies $COPIES --reportable fp"
+        fi
+      else
+        if [[ $MTHUMB == *'enabled'* ]]; then
+          if [ $COPIES -le 0 ]; then
+            INT_COMMAND="runspec --config $GCC_CONFIG --machine a15_thumb_neon --tune=all --rate --reportable int"
+            FP_COMMAND="runspec --config $GCC_CONFIG --machine a15_thumb_neon --tune=all --rate --reportable fp"
+          else
+            INT_COMMAND="runspec --config $GCC_CONFIG --machine a15_thumb_neon --tune=all --rate --copies $COPIES --reportable int"
+            FP_COMMAND="runspec --config $GCC_CONFIG --machine a15_thumb_neon --tune=all --rate --copies $COPIES --reportable fp"
+          fi
+        else
+          if [ $COPIES -le 0 ]; then
+            INT_COMMAND="runspec --config $GCC_CONFIG --machine a15_neon_soft --tune=all --rate --reportable int"
+            FP_COMMAND="runspec --config $GCC_CONFIG --machine a15_neon_soft --tune=all --rate --reportable fp"
+          else
+            INT_COMMAND="runspec --config $GCC_CONFIG --machine a15_neon_soft --tune=all --rate --copies $COPIES --reportable int"
+            FP_COMMAND="runspec --config $GCC_CONFIG --machine a15_neon_soft --tune=all --rate --copies $COPIES --reportable fp"
+          fi
+        fi
+      fi
+    elif [[ $MCPU == *'a9'* ]]; then
+      if [[ $FPABI == *'hard'* ]]; then
+        if [ $COPIES -le 0 ]; then
+          INT_COMMAND="runspec --config $GCC_CONFIG --machine a9_neon_hard --tune=all --rate --reportable int"
+          FP_COMMAND="runspec --config $GCC_CONFIG --machine a9_neon_hard --tune=all --rate --reportable fp"
+        else
+          INT_COMMAND="runspec --config $GCC_CONFIG --machine a9_neon_hard --tune=all --rate --copies $COPIES --reportable int"
+          FP_COMMAND="runspec --config $GCC_CONFIG --machine a9_neon_hard --tune=all --rate --copies $COPIES --reportable fp"
+        fi
+      else
+        if [[ $MTHUMB == *'enabled'* ]]; then
+          if [ $COPIES -le 0 ]; then
+            INT_COMMAND="runspec --config $GCC_CONFIG --machine a9_thumb_neon --tune=all --rate --reportable int"
+            FP_COMMAND="runspec --config $GCC_CONFIG --machine a9_thumb_neon --tune=all --rate --reportable fp"
+          else
+            INT_COMMAND="runspec --config $GCC_CONFIG --machine a9_thumb_neon --tune=all --rate --copies $COPIES --reportable int"
+            FP_COMMAND="runspec --config $GCC_CONFIG --machine a9_thumb_neon --tune=all --rate --copies $COPIES --reportable fp"
+          fi
+        else
+          if [ $COPIES -le 0 ]; then
+            INT_COMMAND="runspec --config $GCC_CONFIG --machine a9_neon_soft --tune=all --rate --reportable int"
+            FP_COMMAND="runspec --config $GCC_CONFIG --machine a9_neon_soft --tune=all --rate --reportable fp"
+          else
+            INT_COMMAND="runspec --config $GCC_CONFIG --machine a9_neon_soft --tune=all --rate --copies $COPIES --reportable int"
+            FP_COMMAND="runspec --config $GCC_CONFIG --machine a9_neon_soft --tune=all --rate --copies $COPIES --reportable fp"
+          fi
+        fi
+      fi
+    elif [[ $MCPU == *'marvell'* ]]; then
+      if [ $COPIES -le 0 ]; then
+        INT_COMMAND="runspec --config $GCC_CONFIG --machine marvell --tune=all --rate --reportable int"
+        FP_COMMAND="runspec --config $GCC_CONFIG --machine marvell --tune=all --rate --reportable fp"
+      else
+        INT_COMMAND="runspec --config $GCC_CONFIG --machine marvell --tune=all --rate --copies $COPIES --reportable int"
+        FP_COMMAND="runspec --config $GCC_CONFIG --machine marvell --tune=all --rate --copies $COPIES --reportable fp"
+      fi
     else
-      INT_COMMAND="runspec --config $GCC_CONFIG --machine a15_neon_hard --tune=all --rate --copies $COPIES --reportable int"
-      FP_COMMAND="runspec --config $GCC_CONFIG --machine a15_neon_hard --tune=all --rate --copies $COPIES --reportable fp"
+      if [ $COPIES -le 0 ]; then
+        INT_COMMAND="runspec --config $GCC_CONFIG --machine generic --tune=all --rate --reportable int"
+        FP_COMMAND="runspec --config $GCC_CONFIG --machine generic --tune=all --rate --reportable fp"
+      else
+        INT_COMMAND="runspec --config $GCC_CONFIG --machine generic --tune=all --rate --copies $COPIES --reportable int"
+        FP_COMMAND="runspec --config $GCC_CONFIG --machine generic --tune=all --rate --copies $COPIES --reportable fp"
+      fi
     fi
   elif [[ $MARCH == *'armv8-a'* ]]; then
-    GCC_CONFIG='lnx-arm64-gcc.cfg'
-    if [ $COPIES -le 0 ]; then
-      INT_COMMAND="runspec --config $GCC_CONFIG --machine v8 --tune=all --rate --reportable int"
-      FP_COMMAND="runspec --config $GCC_CONFIG --machine v8 --tune=all --rate --reportable fp"
+    GCC_CONFIG='lnx-arm64-gcc'
+    if [[ $MCPU == *'a53'* ]]; then
+      if [ $COPIES -le 0 ]; then
+        INT_COMMAND="runspec --config $GCC_CONFIG --machine v8_a53 --tune=all --rate --reportable int"
+        FP_COMMAND="runspec --config $GCC_CONFIG --machine v8_a53 --tune=all --rate --reportable fp"
+      else
+        INT_COMMAND="runspec --config $GCC_CONFIG --machine v8_a53 --tune=all --rate --copies $COPIES --reportable int"
+        FP_COMMAND="runspec --config $GCC_CONFIG --machine v8_a53 --tune=all --rate --copies $COPIES --reportable fp"
+      fi
+    elif [[ $MCPU == *'a57'* ]]; then
+      if [ $COPIES -le 0 ]; then
+        INT_COMMAND="runspec --config $GCC_CONFIG --machine v8_a57 --tune=all --rate --reportable int"
+        FP_COMMAND="runspec --config $GCC_CONFIG --machine v8_a57 --tune=all --rate --reportable fp"
+      else
+        INT_COMMAND="runspec --config $GCC_CONFIG --machine v8_a57 --tune=all --rate --copies $COPIES --reportable int"
+        FP_COMMAND="runspec --config $GCC_CONFIG --machine v8_a57 --tune=all --rate --copies $COPIES --reportable fp"
+      fi
     else
-      INT_COMMAND="runspec --config $GCC_CONFIG --machine v8 --tune=all --rate --copies $COPIES --reportable int"
-      FP_COMMAND="runspec --config $GCC_CONFIG --machine v8 --tune=all --rate --copies $COPIES --reportable fp"
+      if [ $COPIES -le 0 ]; then
+        INT_COMMAND="runspec --config $GCC_CONFIG --machine v8 --tune=all --rate --reportable int"
+        FP_COMMAND="runspec --config $GCC_CONFIG --machine v8 --tune=all --rate --reportable fp"
+      else
+        INT_COMMAND="runspec --config $GCC_CONFIG --machine v8 --tune=all --rate --copies $COPIES --reportable int"
+        FP_COMMAND="runspec --config $GCC_CONFIG --machine v8 --tune=all --rate --copies $COPIES --reportable fp"
+      fi
     fi
   else
     if [ $COPIES -le 0 ]; then
@@ -141,15 +308,15 @@ elif [[ $CPU == *'ARM'* ]] || [[ $CPU == *'AArch'* ]]; then
       FP_COMMAND="runspec --config $GCC_CONFIG --machine generic --tune=all --rate --copies $COPIES --reportable fp"
     fi
   fi
+# unknown
 else
-  PROCESSOR_OPTION='0'
   GCC_CONFIG='Example-linux64-amd64-gcc43+'
   if [ $COPIES -le 0 ]; then
-    INT_COMMAND="runspec --config $GCC_CONFIG --machine native --tune=all --rate --reportable int"
-    FP_COMMAND="runspec --config $GCC_CONFIG --machine native --tune=all --rate --reportable fp"
+    INT_COMMAND="runspec --config $GCC_CONFIG --tune=all --rate --reportable int"
+    FP_COMMAND="runspec --config $GCC_CONFIG --tune=all --rate --reportable fp"
   else
-    INT_COMMAND="runspec --config $GCC_CONFIG --machine native --tune=all --rate --copies $COPIES --reportable int"
-    FP_COMMAND="runspec --config $GCC_CONFIG --machine native --tune=all --rate --copies $COPIES--reportable fp"
+    INT_COMMAND="runspec --config $GCC_CONFIG --tune=all --rate --copies $COPIES --reportable int"
+    FP_COMMAND="runspec --config $GCC_CONFIG --tune=all --rate --copies $COPIES--reportable fp"
   fi
 fi
 
@@ -191,8 +358,9 @@ echo "Checking if CPU2006 needs to be installed and installing if necessary..."
 if [ ! -d "SPECCPU" ]; then
   # install prereqs
   echo "Checking if prerequisites need to be installed and installing if necessary..."
-  #export http_proxy=http://proxy-us.ryanspoone.com:911
-  #export https_proxy=http://proxy-us.ryanspoone.com:911
+  # Add proxies here
+  # export http_proxy=http://proxy-us.ryanspoone.com:80
+  # export https_proxy=http://proxy-us.ryanspoone.com:443
 
   # if apt-get is installed
   if hash apt-get; then
@@ -206,7 +374,7 @@ if [ ! -d "SPECCPU" ]; then
     sudo -E apt-get install gfortran -y -qq
     sudo -E apt-get install automake -y -qq
     # arm
-    if [ '$PROCESSOR_OPTION' == '3' ]; then
+    if [[ $CPU == *'ARM'* ]] || [[ $CPU == *'AArch'* ]]; then
       sudo -E apt-get install gcc-4.8-arm-linux-gnueabi -y -qq
       if [[ $MARCH == *'armv8-a'* ]]; then
         sudo -E apt-get build-dep crossbuild-essential-arm64 -y -qq
@@ -239,7 +407,7 @@ if [ ! -d "SPECCPU" ]; then
     sudo -E yum install gfortran -y --quiet
     sudo -E yum install numactl -y --quiet
     sudo -E yum install automake -y --quiet
-    if [ '$PROCESSOR_OPTION' == '3' ]; then
+    if [[ $CPU == *'ARM'* ]] || [[ $CPU == *'AArch'* ]]; then
       sudo -E yum install gcc-4.8-arm-linux-gnueabi -y --quiet
       if [[ $MARCH == *'armv8-a'* ]]; then
         sudo -E yum-builddep gcc-4.8-arm-linux-gnueabihf-base -y --quiet
@@ -253,7 +421,7 @@ if [ ! -d "SPECCPU" ]; then
   cd SPECCPU
   echo "Extracting cpu2006..."
   tar xf cpu2006-1.2.tar.xz
-  if [ "$PROCESSOR_OPTION" == "3" ]; then
+  if [[ $CPU == *'ARM'* ]] || [[ $CPU == *'AArch'* ]]; then
     # for ARM
     echo "Building for ARM..."
     export FORCE_UNSAFE_CONFIGURE=1
@@ -301,11 +469,12 @@ EOL
       printf 'Fixing _GL_WARN_ON_USE errors: %s\n' "$gl_warn_file"
       sed -i 's/_GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");//g' $gl_warn_file
     done
-
     # build
     ./setup.sh
     cd ../..
     source shrc
+    # add extract custom binaries here
+    # tar xf custom_binaries.tar.gz
     cp ../config/*.cfg $SPEC/config/
   else
     ./install.sh <<< "yes"

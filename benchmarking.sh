@@ -91,11 +91,6 @@ FPABI=$(gcc -march=native -Q --help=target 2>> /dev/null | grep mfloat-abi)
 # generating code that executes Thumb state
 MTHUMB=$(gcc -march=native -Q --help=target 2>> /dev/null | grep "\-mthumb ")
 
-echo $MARCH
-echo $MCPU
-echo $FPABI
-echo $MTHUMB
-
 # Intel Processors
 if [[ $CPU == *'Intel'* ]]; then
   GCC_CONFIG='lnx-x86_64-gcc'

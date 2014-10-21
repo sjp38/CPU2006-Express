@@ -53,10 +53,10 @@ The assumed file structure is as follows:
 │   ├── config.guess
 │   └── README.md
 ├── config/
-│   ├── lnx-arm-gcc.cfg
-│   ├── lnx-arm64-gcc.cfg
-│   ├── lnx-i686-gcc.cfg
-│   └── lnx-x86_64-gcc.cfg
+│   ├── linux-arm32-gcc.cfg
+│   ├── linux-arm64-gcc.cfg
+│   ├── linux-intel32-gcc.cfg
+│   └── linux-intel64-gcc.cfg
 ├── SPECCPU.tar
 │   ├── cpu2006-1.2.tar.xz
 │   └── whatever custom binaries

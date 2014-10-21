@@ -93,10 +93,9 @@ MTHUMB=$(gcc -march=native -Q --help=target 2>> /dev/null | grep "\-mthumb ")
 
 # Intel Processors
 if [[ $CPU == *'Intel'* ]]; then
-  GCC_CONFIG='lnx-x86_64-gcc'
-
   # 32 bit
   if [[ $ARCH == *'32'* ]]; then
+    GCC_CONFIG='linux-intel32-gcc'
     if [[ $MARCH == *'corei7-avx2'* ]]; then
       if [ $COPIES -le 0 ]; then
         INT_COMMAND="runspec --config $GCC_CONFIG --machine corei7-avx2 --tune=all --rate --reportable int"
@@ -156,6 +155,7 @@ if [[ $CPU == *'Intel'* ]]; then
     fi
   # 64 bit
   else
+    GCC_CONFIG='linux-intel64-gcc'
     if [[ $MARCH == *'corei7-avx2'* ]]; then
       if [ $COPIES -le 0 ]; then
         INT_COMMAND="runspec --config $GCC_CONFIG --machine corei7-avx2 --tune=all --rate --reportable int"
@@ -192,7 +192,7 @@ if [[ $CPU == *'Intel'* ]]; then
   fi
 # ARM processors
 elif [[ $CPU == *'ARM'* ]] || [[ $CPU == *'AArch'* ]]; then
-  GCC_CONFIG='lnx-arm-gcc'
+  GCC_CONFIG='linux-arm32-gcc'
   if [[ $MARCH == *'armv7-a'* ]]; then
     if [[ $MCPU == *'a15'* ]]; then
       if [[ $FPABI == *'hard'* ]]; then
@@ -268,7 +268,7 @@ elif [[ $CPU == *'ARM'* ]] || [[ $CPU == *'AArch'* ]]; then
       fi
     fi
   elif [[ $MARCH == *'armv8-a'* ]]; then
-    GCC_CONFIG='lnx-arm64-gcc'
+    GCC_CONFIG='linux-arm64-gcc'
     if [[ $MCPU == *'a53'* ]]; then
       if [ $COPIES -le 0 ]; then
         INT_COMMAND="runspec --config $GCC_CONFIG --machine v8_a53 --tune=all --rate --reportable int"

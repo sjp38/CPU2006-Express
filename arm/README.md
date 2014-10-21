@@ -13,6 +13,9 @@ Contents
 + [Project Main Page](/)
 
 
+Patching information was found here: https://code.google.com/p/mycodespot/wiki/RunningSPEC2006
+
+
 Setup
 -----
 

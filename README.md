@@ -51,6 +51,7 @@ The assumed file structure is as follows:
 /
 ├── arm/
 │   ├── config.guess
+│   ├── config.sub
 │   └── README.md
 ├── config/
 │   ├── linux-arm32-gcc.cfg

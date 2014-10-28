@@ -157,7 +157,7 @@ Errors:
 
 I fixed this error by updating the CPU2006's config.guess files with the located current version [here](http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.guess;hb=HEAD). I also updated config.sub files for good measure (config.guess should suffice though). The current version of config.sub is [here](http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.sub;hb=HEAD).
 
-To file the config.guess files:
+To find the config.guess files:
 
 ```bash
 find . -iname 'config.guess' -print0
@@ -165,7 +165,7 @@ find . -iname 'config.guess' -print0
 
 Then copy your new config.guess file to those locations.
 
-To file the config.sub files:
+To find the config.sub files:
 
 ```bash
 find . -iname 'config.sub' -print0

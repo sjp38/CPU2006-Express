@@ -155,15 +155,23 @@ Errors:
 
 `checking build system type... config/config.guess: unable to guess system type`
 
-I fixed this error by updating the CPU2006's config.guess files with the located current version  [here](http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.guess;hb=HEAD).
+I fixed this error by updating the CPU2006's config.guess files with the located current version [here](http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.guess;hb=HEAD). I also updated config.sub files for good measure (config.guess should suffice though). The current version of config.sub is [here](http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.sub;hb=HEAD).
 
-To find the config.guess files:
+To file the config.guess files:
 
 ```bash
 find . -iname 'config.guess' -print0
 ```
 
 Then copy your new config.guess file to those locations.
+
+To file the config.sub files:
+
+```bash
+find . -iname 'config.sub' -print0
+```
+
+Then copy your new config.sub file to those locations.
 
 
 ---------------------------------------
@@ -190,6 +198,7 @@ sed -i 's/_GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");
 
 sed -i 's/_GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");//g' specsum/win32/stdio.h
 ```
+
 
 All In One Script:
 ------------------
@@ -228,13 +237,20 @@ EOL
 sed -i 's/march=native/march='$MARCH'/g' setup.sh
 
 chmod +x setup.sh
+
 # update the config.guess files
 chmod 775 ../../../arm/config.guess
 while IFS= read -d $'\0' -r guess_file ; do
   printf 'Updating config.guess file: %s\n' "$guess_file"
   cp ../../../arm/config.guess $guess_file
 done < <(find . -iname 'config.guess' -print0)
-wait
+
+# update the config.sub files
+chmod 775 ../../../arm/config.sub
+while IFS= read -d $'\0' -r sub_file ; do
+  printf 'Updating config.sub file: %s\n' "$sub_file"
+  cp ../../../arm/config.sub $sub_file
+done < <(find . -iname 'config.sub' -print0)
 
 # fix errors
 find . -type f -exec grep -H '_GL_WARN_ON_USE (gets, "gets is a security hole - use fgets instead");' {} + | awk '{print $1;}' | sed 's/:_GL_WARN_ON_USE//g' | while read -r gl_warn_file; do 

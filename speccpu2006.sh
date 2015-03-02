@@ -863,8 +863,6 @@ EOL
     else
       ./install.sh <<< "yes"
       source shrc
-      echo "Extracting ICC files..."
-      tar xfv 'cpu2006.1.2.ic14.0.linux64.for.intel.16jan2014.tar.xz'
       cp ../config/*.cfg "$SPEC"/config/
     fi
   ############################################################

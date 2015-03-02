@@ -3,7 +3,7 @@
 ##############################################################################
 #  speccpu2006.sh - This harness performs SPEC CPU2006 benchmarking using
 #  GCC. Unless changed by user flags, a full run will commence resulting in
-#  install prerequites, building and installing SPEC CPU2006, then running
+#  installing prerequisites, building and installing SPEC CPU2006, then running
 #  reportable integer and floating-point runs.
 #
 #  Required file tree:

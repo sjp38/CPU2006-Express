@@ -38,13 +38,13 @@ apt-get install git git-core
 Clone this repository:
 
 ```bash
-git clone https://github.com/ryanspoone/Automating-SPEC-CPU2006-for-Linux.git
+git clone https://github.com/ryanspoone/CPU2006-Express.git
 ```
 
 Change directories and run this script:
 
 ```bash
-cd Automating-SPEC-CPU2006-for-Linux/
+cd CPU2006-Express/
 chmod +x speccpu2006.sh
 ./speccpu2006.sh
 ```

@@ -44,8 +44,8 @@
 #     4/1/2015
 #
 #  Authors/Contributors:
-#     Ryan Spoone (https://github.com/ryanspoone)
-#     Tyler Stachecki (https://github.com/tj90241)
+#     Ryan Spoone (github.com/ryanspoone)
+#     Tyler Stachecki (github.com/tj90241)
 #
 ##############################################################################
 

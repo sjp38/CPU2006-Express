@@ -1,7 +1,7 @@
 Benchmarking
 ============
 
-This harness performs SPEC CPU2006 benchmarking using GCC on Intel and ARM systems. Unless changed by user flags, a full run will commence resulting in install prerequites, building and installing SPEC CPU2006, then running reportable integer and floating-point runs.
+This harness performs SPEC CPU2006 benchmarking using GCC. Capabilities include in installing prerequisites, building and installing SPEC CPU2006, and running reportable integer and floating-point runs.
 
 
 Contents:

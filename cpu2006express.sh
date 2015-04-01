@@ -16,7 +16,7 @@
 #  |   |-- linux64-intel64-gcc.cfg
 #  |   `-- linux64-powerpc-gcc.cfg
 #  |
-#  |-- src
+#  |-- bin
 #  |   |-- setup.sh
 #  |   |-- spinner.sh
 #  |   `-- user_input.sh

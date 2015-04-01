@@ -84,18 +84,20 @@ Option          GNU long option         Meaning
 Required file tree:
 ==================
 ```
- |-- config
- |   |-- linux32-arm32-gcc.cfg
- |   |-- linux32-intel32-gcc.cfg
- |   |-- linux64-arm64-gcc.cfg
- |   |-- linux64-intel64-gcc.cfg
- |   `-- linux64-powerpc-gcc.cfg
- |
- |-- src
- |   |-- setup.sh
- |   |-- spinner.sh
- |   `-- user_input.sh
- |
+|-- config
+|   |-- linux32-arm32-gcc.cfg
+|   |-- linux32-intel32-gcc.cfg
+|   |-- linux64-arm64-gcc.cfg
+|   |-- linux64-intel64-gcc.cfg
+|   `-- linux64-powerpc-gcc.cfg
+|
+|-- bin
+|   |-- setup.sh
+|   |-- spinner.sh
+|   `-- user_input.sh
+|
+|-- cpu2006-*.tar* (You provide this file)
+|
  `-- cpu2006express.sh
 ```
 

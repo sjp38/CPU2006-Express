@@ -82,6 +82,7 @@ if [[ "$#" -gt 0 ]]; then
     elif [[ "$ARG" == "-c" || "$ARG" == "--complete" ]]; then
       INT=true
       FP=true
+      NOPREREQ=false
       shift
     elif [[ "$ARG" == "-r" || "$ARG" == "--rebuild" ]]; then
       REBUILD=true

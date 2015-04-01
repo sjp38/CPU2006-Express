@@ -294,11 +294,11 @@ fi
 ############################################################
 # Select the proper machine flag for the config file
 ############################################################
-if [[ $(containsElement "${KNOWN_MARCH[@]}" "$MARCH") == 'y' ]]; then
-  export MACHINE=$MARCH
-else
-  if [[ $(containsElement "${KNOWN_MTUNE[@]}" "$MTUNE") == 'y' ]]; then
+if [[ $(containsElement "${KNOWN_MTUNE[@]}" "$MTUNE") == 'y' ]]; then
     export MACHINE=$MTUNE
+else
+  if [[ $(containsElement "${KNOWN_MARCH[@]}" "$MARCH") == 'y' ]]; then
+    export MACHINE=$MARCH
   else
     echo
     echo 'We cannot determine your machine architecture.'

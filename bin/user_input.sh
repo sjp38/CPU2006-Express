@@ -10,7 +10,7 @@
 #     3/31/2015
 #
 #  Authors/Contributors:
-#     Ryan Spoone (ryan.spoone@intel.com)
+#     Ryan Spoone (github.com/ryanspoone)
 #
 ##############################################################################
 

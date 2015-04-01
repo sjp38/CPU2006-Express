@@ -125,13 +125,15 @@ function setup {
   if [ ! -d "src" ]; then
     echo "Extracting SPECCPU..."
     mkdir src
-    # Download cpu2006-1.2.tar.xz if it doesn't exist then extract
     for file in ./cpu2006-*tar*; do
       if [ -e "$file" ]; then
         tar xfv "$file" -C src
       else
-        wget http://storage.dcpcomp.intel.com/files/cpu2006-1.2.tar.xz
-        tar xfv cpu2006-1.2.tar.xz -C src
+        echo
+        echo -n "Could not find your CPU2006 tar archive. Where is it? "
+        read SPECCPU_TAR
+        echo
+        tar xfv "$SPECCPU_TAR" -C src
       fi
     done
     cd src

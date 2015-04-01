@@ -114,6 +114,11 @@ function buildSPECCPU {
   fi
   ./buildtools
   cd ../..
+  
+  # export clean up
+  unset CFLAGS
+  unset PERLFLAGS
+  unset FORCE_UNSAFE_CONFIGURE
 }
 
 

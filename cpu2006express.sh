@@ -2,7 +2,7 @@
 
 ##############################################################################
 #  cpu2006express.sh - This utility performs SPEC CPU2006 benchmarking using
-#  GCC. Capabilities include in installing prerequites, building and
+#  GCC. Capabilities include in installing prerequisites, building and
 #  installing SPEC CPU2006, and running reportable integer and floating-point
 #  runs.
 

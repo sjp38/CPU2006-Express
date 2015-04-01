@@ -10,9 +10,9 @@ Contents:
 + [Download](#download)
 + [Usage](#usage)
 + [Required File Tree](#required-file-tree)
-+ [Troubleshooting](#troubleshooting)
-+ [Optimizing GCC Process](#process-for-optimizing-gcc)
-+ [Runspec Errors](#runspec-errors)
++ [TODO](#todo)
++ [Adding Additional Systems](#adding-additional-systems)
++ [Errors](#runspec-errors)
 
 
 Download:
@@ -57,7 +57,7 @@ command:
 For a full run:
 
 ```bash
-./cpu2006express.sh
+./cpu2006express.sh -c
 ```
 
 Customized run:
@@ -101,18 +101,41 @@ Required file tree:
 
 
 TODO:
------
+=====
 
 1. Add ICC support
 2. Add flags
 
-Process for optimizing GCC:
-===========================
 
-1. Get GCC capable flags: `gcc -march=native -Q --help=target` or `echo "int main {return 0;}" | gcc [OPTIONS] -x c -v -Q -`
-2. Go to [ARK](http://ark.intel.com/) to get CPU information and fill in hw_* information.
-3. Check [SPEC CPU2006](http://www.spec.org/cgi-bin/osgresults?conf=rint2006) for submitted results.
-4. Trial and error.
+Adding Additional Systems:
+=========================
+
+If your system isn't being detected:
+------------------------------------
+
+1. Add something simpler to this below line `174` in the `cpu2006express.sh` file:
+   + change `your_system_keyword` to the keyword infront of your processor name in the `/proc/cpuinfo` file.
+
+   ```bash
+############################################################
+# If CPU is still empty
+# This is mainly for X systems
+# Example: X
+############################################################
+if [ -z "$CPU" ]; then
+  CPU=$(grep your_system_keyword /proc/cpuinfo | uniq | sed 's/your_system_keyword\s*:\s//g')
+fi
+   ```
+2. Add something simpler to this below line `287` in the `cpu2006express.sh` file:
+   + change `YOUR_SYSTEM` to your processor name in the `/proc/cpuinfo` file.
+   + change `YOUR_SYSTEM_CONFIG` to your config file name.
+
+   ```bash
+elif [[ $CPU == *'YOUR_SYSTEM'* ]]; then
+    export GCC_CONFIG='YOUR_SYSTEM_CONFIG'
+   ```
+3. Add your machine information to `user_input.sh`.
+4. Make sure your system is using the `-march=` flag, otherwise you might want to add a case to line `260`. I had to add PowerPC this way because they use `-mcpu` instead.
 
 
 Runspec Errors:
@@ -121,8 +144,6 @@ Runspec Errors:
 `/usr/bin/ld: cannot find -lm` and/or `/usr/bin/ld: cannot find -lc`
 
 + RHEL: remove `-static` from the compiler flags in the config file.
-
-
 
 -------------
 

@@ -129,7 +129,7 @@ if [ -z "$CPU" ]; then
 fi
    ```
 2. Add something simpler to this below line **`287`** in the **`cpu2006express.sh`** file:
-   + change ***`YOUR_SYSTEM`*** to your processor name in the `/proc/cpuinfo` file.
+   + change ***`YOUR_SYSTEM`*** to your processor name in the **`/proc/cpuinfo`** file.
    + change ***`YOUR_SYSTEM_CONFIG`*** to your config file name.
 
    ```bash

@@ -116,7 +116,7 @@ If your system isn't being detected:
 ------------------------------------
 
 1. Add something simpler to this below line `174` in the `cpu2006express.sh` file:
-   + change `your_system_keyword` to the keyword infront of your processor name in the `/proc/cpuinfo` file.
+   + change `YOUR_SYSTEM_KEYWORD` to the keyword infront of your processor name in the `/proc/cpuinfo` file.
 
    ```bash
 ############################################################
@@ -125,7 +125,7 @@ If your system isn't being detected:
 # Example: X
 ############################################################
 if [ -z "$CPU" ]; then
-  CPU=$(grep your_system_keyword /proc/cpuinfo | uniq | sed 's/your_system_keyword\s*:\s//g')
+  CPU=$(grep 'YOUR_SYSTEM_KEYWORD' /proc/cpuinfo | uniq | sed 's/YOUR_SYSTEM_KEYWORD\s*:\s//g')
 fi
    ```
 2. Add something simpler to this below line `287` in the `cpu2006express.sh` file:

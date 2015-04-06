@@ -85,8 +85,8 @@ Option          GNU long option         Meaning
 Supported Systems:
 ==================
 
-**Intel**
----------
+Intel
+-----
 
 + core2
 + nehalem
@@ -103,8 +103,8 @@ Supported Systems:
 + core-avx2
 + atom
 
-**ARM**
----------
+ARM
+----
 + armv8-a
 + armv7-a
 + cortex-a9
@@ -117,8 +117,8 @@ Supported Systems:
 + cortex-a57
 + cortex-a53
   
-**PowerPC**
----------
+PowerPC
+-------
 + power8
 + power7
 + powerpc

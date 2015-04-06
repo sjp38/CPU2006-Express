@@ -116,7 +116,7 @@ If your system isn't being detected:
 ------------------------------------
 
 1. Add something simpler to this below line **`174`** in the **`cpu2006express.sh`** file:
-   + change ***`YOUR_SYSTEM_KEYWORD`*** to the keyword infront of your processor name in the **`/proc/cpuinfo`** file.
+   + Change ***`YOUR_SYSTEM_KEYWORD`*** to the keyword infront of your processor name in the **`/proc/cpuinfo`** file.
 
    ```bash
 ############################################################
@@ -129,8 +129,8 @@ if [ -z "$CPU" ]; then
 fi
    ```
 2. Add something simpler to this below line **`287`** in the **`cpu2006express.sh`** file:
-   + change ***`YOUR_SYSTEM`*** to your processor name in the **`/proc/cpuinfo`** file.
-   + change ***`YOUR_SYSTEM_CONFIG`*** to your config file name.
+   + Change ***`YOUR_SYSTEM`*** to your processor name in the **`/proc/cpuinfo`** file.
+   + Change ***`YOUR_SYSTEM_CONFIG`*** to your config file name.
 
    ```bash
 elif [[ $CPU == *'YOUR_SYSTEM'* ]]; then

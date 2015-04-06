@@ -131,14 +131,14 @@ Tested Systems:
 
 + ARM
    + 64-bit
-      + xgene1
+      + X-Gene 1
    + 32-bit
-      + cortex-a15
+      + Cortex-a15
 + Intel
    + 64-bit
-      + ivybridge
-      + haswell
-      + broadwell
+      + Ivybridge
+      + Haswell
+      + Broadwell
 + PowerPC
    + 64-bit
       + Power8

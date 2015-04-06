@@ -115,8 +115,8 @@ Adding Additional Systems:
 If your system isn't being detected:
 ------------------------------------
 
-1. Add something simpler to this below line `174` in the `cpu2006express.sh` file:
-   + change `YOUR_SYSTEM_KEYWORD` to the keyword infront of your processor name in the `/proc/cpuinfo` file.
+1. Add something simpler to this below line **`174`** in the **`cpu2006express.sh`** file:
+   + change ***`YOUR_SYSTEM_KEYWORD`*** to the keyword infront of your processor name in the **`/proc/cpuinfo`** file.
 
    ```bash
 ############################################################
@@ -128,29 +128,29 @@ if [ -z "$CPU" ]; then
   CPU=$(grep 'YOUR_SYSTEM_KEYWORD' /proc/cpuinfo | uniq | sed 's/YOUR_SYSTEM_KEYWORD\s*:\s//g')
 fi
    ```
-2. Add something simpler to this below line `287` in the `cpu2006express.sh` file:
-   + change `YOUR_SYSTEM` to your processor name in the `/proc/cpuinfo` file.
-   + change `YOUR_SYSTEM_CONFIG` to your config file name.
+2. Add something simpler to this below line **`287`** in the **`cpu2006express.sh`** file:
+   + change ***`YOUR_SYSTEM`*** to your processor name in the `/proc/cpuinfo` file.
+   + change ***`YOUR_SYSTEM_CONFIG`*** to your config file name.
 
    ```bash
 elif [[ $CPU == *'YOUR_SYSTEM'* ]]; then
     export GCC_CONFIG='YOUR_SYSTEM_CONFIG'
    ```
-3. Add your machine information to `user_input.sh`.
-4. Make sure your system is using the `-march=` flag, otherwise you might want to add a case to line `260` in the `/proc/cpuinfo` file. 
-   + I had to add PowerPC this way because they use `-mcpu` instead.
+3. Add your machine information to **`user_input.sh`**.
+4. Make sure your system is using the **`-march=`** flag, otherwise you might want to add a case to line `260` in the **`/proc/cpuinfo`** file. 
+   + I had to add PowerPC this way because they use **`-mcpu`** instead.
 
 
 Runspec Errors:
 ===============
 
-`/usr/bin/ld: cannot find -lm` and/or `/usr/bin/ld: cannot find -lc`
+**`/usr/bin/ld: cannot find -lm`** and/or **`/usr/bin/ld: cannot find -lc`**
 
-+ RHEL: remove `-static` from the compiler flags in the config file.
++ RHEL: remove **`-static`** from the compiler flags in the config file.
 
 -------------
 
-`copy 0 non-zero return code` or other build errors.
+**`copy 0 non-zero return code`** or other build errors.
 
 Change the portability options for that benchmark. Here are some options:
 

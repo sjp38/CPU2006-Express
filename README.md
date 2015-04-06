@@ -9,6 +9,8 @@ Contents:
 
 + [Download](#download)
 + [Usage](#usage)
++ [Supported Systems](#supported-systems)
++ [Tested Systems](#tested-systems)
 + [Required File Tree](#required-file-tree)
 + [TODO](#todo)
 + [Adding Additional Systems](#adding-additional-systems)
@@ -79,6 +81,67 @@ Option          GNU long option         Meaning
    -p             --prereq                Install prerequisites
    -q             --quiet                 Show less detailed information
 ```
+
+Supported Systems:
+==================
+
+**Intel**
+---------
+
++ core2
++ nehalem
++ westmere
++ sandybridge
++ ivybridge
++ haswell
++ broadwell
++ bonnell
++ silvermont
++ corei7
++ corei7-avx
++ core-avx-i
++ core-avx2
++ atom
+
+**ARM**
+---------
++ armv8-a
++ armv7-a
++ cortex-a9
++ cortex-a15
++ marvell-pj4
++ generic
++ xgene1
++ thunderx
++ cortex-a72
++ cortex-a57
++ cortex-a53
+  
+**PowerPC**
+---------
++ power8
++ power7
++ powerpc
++ powerpc64
++ rs64
+  
+
+Tested Systems:
+===============
+
++ ARM
+   + 64-bit
+      + xgene1
+   + 32-bit
+      + cortex-a15
++ Intel
+   + 64-bit
+      + ivybridge
+      + haswell
+      + broadwell
++ PowerPC
+   + 64-bit
+      + Power8
 
 
 Required file tree:

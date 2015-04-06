@@ -21,29 +21,29 @@ Download:
 To download these files, first install git:
 
 ```bash
-yum install git
+sudo yum install git
 ```
 
 
 Or if you are using a Debian-based distribution:
 
 ```bash
-apt-get install git
+sudo apt-get install git
 ```
 
 
 Clone this repository:
 
 ```bash
-git clone https://github.com/ryanspoone/cpu2006-express.git
+sudo git clone https://github.com/ryanspoone/cpu2006-express.git
 ```
 
 Change directories and run this script:
 
 ```bash
 cd cpu2006-express/
-chmod +x cpu2006express.sh
-./cpu2006express.sh
+sudo chmod +x cpu2006express.sh
+sudo ./cpu2006express.sh
 ```
 
 
@@ -57,13 +57,13 @@ command:
 For a full run:
 
 ```bash
-./cpu2006express.sh -c
+sudo ./cpu2006express.sh -c
 ```
 
 Customized run:
 
 ```bash
-./cpu2006express.sh [OPTIONS]
+sudo ./cpu2006express.sh [OPTIONS]
 ```
 
 Where the options are:
@@ -137,7 +137,8 @@ elif [[ $CPU == *'YOUR_SYSTEM'* ]]; then
     export GCC_CONFIG='YOUR_SYSTEM_CONFIG'
    ```
 3. Add your machine information to `user_input.sh`.
-4. Make sure your system is using the `-march=` flag, otherwise you might want to add a case to line `260`. I had to add PowerPC this way because they use `-mcpu` instead.
+4. Make sure your system is using the `-march=` flag, otherwise you might want to add a case to line `260` in the `/proc/cpuinfo` file. 
+   + I had to add PowerPC this way because they use `-mcpu` instead.
 
 
 Runspec Errors:

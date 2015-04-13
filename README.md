@@ -1,17 +1,18 @@
-Benchmarking
-============
+SPEC CPU2006 Express
+====================
 
 This harness performs SPEC CPU2006 benchmarking using GCC. Capabilities include in installing prerequisites, building and installing SPEC CPU2006, and running reportable integer and floating-point runs.
 
+**Note: You must provide the cpu2006 tar archive.**
 
 Contents:
 ---------
 
 + [Download](#download)
++ [Required File Tree](#required-file-tree)
 + [Usage](#usage)
 + [Supported Systems](#supported-systems)
 + [Tested Systems](#tested-systems)
-+ [Required File Tree](#required-file-tree)
 + [TODO](#todo)
 + [Adding Additional Systems](#adding-additional-systems)
 + [Errors](#runspec-errors)
@@ -48,6 +49,25 @@ sudo chmod +x cpu2006express.sh
 sudo ./cpu2006express.sh
 ```
 
+Required file tree:
+==================
+```
+|-- config
+|   |-- linux32-arm32-gcc.cfg
+|   |-- linux32-intel32-gcc.cfg
+|   |-- linux64-arm64-gcc.cfg
+|   |-- linux64-intel64-gcc.cfg
+|   `-- linux64-powerpc-gcc.cfg
+|
+|-- bin
+|   |-- setup.sh
+|   |-- spinner.sh
+|   `-- user_input.sh
+|
+|-- cpu2006-*.tar* (You provide this file)
+|
+ `-- cpu2006express.sh
+```
 
 Usage:
 ======
@@ -144,32 +164,12 @@ Tested Systems:
       + Power8
 
 
-Required file tree:
-==================
-```
-|-- config
-|   |-- linux32-arm32-gcc.cfg
-|   |-- linux32-intel32-gcc.cfg
-|   |-- linux64-arm64-gcc.cfg
-|   |-- linux64-intel64-gcc.cfg
-|   `-- linux64-powerpc-gcc.cfg
-|
-|-- bin
-|   |-- setup.sh
-|   |-- spinner.sh
-|   `-- user_input.sh
-|
-|-- cpu2006-*.tar* (You provide this file)
-|
- `-- cpu2006express.sh
-```
-
-
 TODO:
 =====
 
 1. Add ICC support
 2. Add flags
+3. Isolate floating-point run errors
 
 
 Adding Additional Systems:

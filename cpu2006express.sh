@@ -46,6 +46,7 @@
 #  Authors/Contributors:
 #     Ryan Spoone (github.com/ryanspoone)
 #     Tyler Stachecki (github.com/tj90241)
+#     Matthew Nicely (github.com/manicely6005)
 #
 ##############################################################################
 
@@ -68,7 +69,7 @@ FP=false
 NOCOPY=false
 
 ############################################################
-# Argument parsing
+# Flag parsing
 ############################################################
 if [[ "$#" -gt 0 ]]; then
   while [ "$1" ]; do
@@ -149,7 +150,7 @@ fi
 ulimit -s unlimited
 
 ############################################################
-# Will display make, type, and model number
+# Will display CPU info
 # Example: Intel Atom C2750
 # Example: Intel Xeon E5-1650 0
 ############################################################
@@ -194,7 +195,7 @@ else
 fi
 
 ############################################################
-# GCC Version
+# GCC version
 ############################################################
 GCC_VER=$(gcc --version | sed -rn 's/gcc\s\(.*\)\s([0-9]*\.[0-9]*\.[0-9]*)/\1/p')
 GCC_VER_NO_DOTS=${GCC_VER//\./}
@@ -240,7 +241,6 @@ RAM_KB=$(grep "MemTotal:      " /proc/meminfo | sed "s/MemTotal:      //g" | tr 
 
 ############################################################
 # Convert RAM to GB
-# 1000 instead of 1024 due to manufacturer math
 ############################################################
 RAM_GB=$((RAM_KB / 1000 / 1000))
 

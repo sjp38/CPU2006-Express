@@ -207,16 +207,16 @@ fi
 # Detect os architecture, os distribution, and os version
 # Displays bits, either 64 or 32
 ############################################################
-ARCH=$(uname -m | sed 's/x86_//;s/i[3-6]86/32/' | sed 's/[^0-9]*//g')
+ARCH=$(uname -m | sed 's/x86_//;s/i[3-6]86/32/')
 
 ############################################################
 # If it is an ARM system
 ############################################################
-if [[ $ARCH == *'arm'* ]]; then
+if [[ $ARCH == *'aarch64'* || $ARCH == *'arm'*]]; then
   # Get the ARM version number
-  ARM_V=$(echo "$ARCH" | sed 's/armv//g' | head -c1)
+  ARM_V=$(echo "$ARCH" | sed 's/armv//g' | sed 's/[^0-9]*//g')
   # If ARMv8 or greater, set to 62 bit
-  if [ "$ARM_V" -ge '8' ]; then
+  if [ "$ARM_V" -ge '8' || $ARCH == *'aarch64'* ]; then
     ARCH='64'
   else
     ARCH='32'

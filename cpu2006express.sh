@@ -150,11 +150,20 @@ fi
 ulimit -s unlimited
 
 ############################################################
-# Will display CPU info
+# Will display make, type, and model number
+# Example: GenuineIntel
+############################################################
+CPU=$(grep 'vendor_id' /proc/cpuinfo | uniq | sed 's/vendor_id\s*:\s//g')
+
+############################################################
+# If CPU is still empty
+# This is mainly for Intel systems
 # Example: Intel Atom C2750
 # Example: Intel Xeon E5-1650 0
 ############################################################
-CPU=$(grep 'model name' /proc/cpuinfo | uniq | sed 's/model name\s*:\s//g')
+if [ -z "$CPU" ]; then
+  CPU=$(grep 'model name' /proc/cpuinfo | uniq | sed 's/model name\s*:\s//g')
+fi
 
 ############################################################
 # If CPU is empty
@@ -163,14 +172,6 @@ CPU=$(grep 'model name' /proc/cpuinfo | uniq | sed 's/model name\s*:\s//g')
 ############################################################
 if [ -z "$CPU" ]; then
   CPU=$(grep 'Processor' /proc/cpuinfo | uniq | sed 's/Processor\s*:\s//g')
-fi
-
-############################################################
-# If CPU is still empty
-# This is mainly for preproduction systems
-############################################################
-if [ -z "$CPU" ]; then
-  CPU=$(grep 'vendor_id' /proc/cpuinfo | uniq | sed 's/vendor_id\s*:\s//g')
 fi
 
 ############################################################

@@ -167,6 +167,14 @@ fi
 
 ############################################################
 # If CPU is still empty
+# This is mainly for preproduction systems
+############################################################
+if [ -z "$CPU" ]; then
+  CPU=$(grep 'vendor_id' /proc/cpuinfo | uniq | sed 's/vendor_id\s*:\s//g')
+fi
+
+############################################################
+# If CPU is still empty
 # This is mainly for PowerPC systems
 # Example: POWER8 (raw), altivec supported
 ############################################################

@@ -149,6 +149,16 @@ PowerPC
 Tested Systems:
 ===============
 
+Operating Systems
+-----------------
+
++ Ubuntu 14.04+
++ CentOS 7+
++ RHEL 6.5+
+
+Platforms
+---------
+
 + ARM
    + 64-bit
       + X-Gene 1
@@ -167,9 +177,8 @@ Tested Systems:
 TODO:
 =====
 
-1. Add ICC support
-2. Add flags
-3. Isolate floating-point run errors
+1. Add config flags xml
+2. Isolate floating-point run errors
 
 
 Adding Additional Systems:
@@ -178,7 +187,7 @@ Adding Additional Systems:
 If your system isn't being detected:
 ------------------------------------
 
-1. Add something simpler to this below line **`174`** in the **`cpu2006express.sh`** file:
+1. Add something simpler to this below line **[184](https://github.com/ryanspoone/CPU2006-Express/blob/master/cpu2006express.sh#L184)** in the **[cpu2006express.sh](https://github.com/ryanspoone/CPU2006-Express/blob/master/cpu2006express.sh)** file:
    + Change ***`YOUR_SYSTEM_KEYWORD`*** to the keyword infront of your processor name in the **`/proc/cpuinfo`** file.
 
    ```bash
@@ -191,16 +200,16 @@ if [ -z "$CPU" ]; then
   CPU=$(grep 'YOUR_SYSTEM_KEYWORD' /proc/cpuinfo | uniq | sed 's/YOUR_SYSTEM_KEYWORD\s*:\s//g')
 fi
    ```
-2. Add something simpler to this below line **`287`** in the **`cpu2006express.sh`** file:
+2. Add something simpler to this below line **[296](https://github.com/ryanspoone/CPU2006-Express/blob/master/cpu2006express.sh#L296)** in the **[cpu2006express.sh](https://github.com/ryanspoone/CPU2006-Express/blob/master/cpu2006express.sh)** file:
    + Change ***`YOUR_SYSTEM`*** to your processor name in the **`/proc/cpuinfo`** file.
    + Change ***`YOUR_SYSTEM_CONFIG`*** to your config file name.
 
    ```bash
-elif [[ $CPU == *'YOUR_SYSTEM'* ]]; then
+   elif [[ $CPU == *'YOUR_SYSTEM'* ]]; then
     export GCC_CONFIG='YOUR_SYSTEM_CONFIG'
    ```
-3. Add your machine information to **`user_input.sh`**.
-4. Make sure your system is using the **`-march=`** flag, otherwise you might want to add a case to line `260` in the **`/proc/cpuinfo`** file. 
+3. Add your machine information to **[user_input.sh](https://github.com/ryanspoone/CPU2006-Express/blob/master/bin/user_input.sh)**.
+4. Make sure your system is using the **`-march=`** flag, otherwise you might want to add a case to line **[274](https://github.com/ryanspoone/CPU2006-Express/blob/master/cpu2006express.sh#L274)** in the **[cpu2006express.sh](https://github.com/ryanspoone/CPU2006-Express/blob/master/cpu2006express.sh)** file. 
    + I had to add PowerPC this way because they use **`-mcpu`** instead.
 
 

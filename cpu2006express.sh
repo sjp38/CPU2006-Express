@@ -226,7 +226,7 @@ if [[ $ARCH == *'aarch64'* || $ARCH == *'arm'* ]]; then
   # Get the ARM version number
   ARM_V=$(echo "$ARCH" | sed 's/armv//g' | sed 's/[^0-9]*//g')
   # If ARMv8 or greater, set to 62 bit
-  if [ "$ARM_V" -ge '8' || $ARCH == *'aarch64'* ]; then
+  if [[ "$ARM_V" -ge '8' || $ARCH == *'aarch64'* ]]; then
     ARCH='64'
   else
     ARCH='32'

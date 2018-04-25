@@ -222,7 +222,7 @@ ARCH=$(uname -m | sed 's/x86_//;s/i[3-6]86/32/')
 ############################################################
 # If it is an ARM system
 ############################################################
-if [[ $ARCH == *'aarch64'* || $ARCH == *'arm'*]]; then
+if [[ $ARCH == *'aarch64'* || $ARCH == *'arm'* ]]; then
   # Get the ARM version number
   ARM_V=$(echo "$ARCH" | sed 's/armv//g' | sed 's/[^0-9]*//g')
   # If ARMv8 or greater, set to 62 bit
